@@ -1,0 +1,171 @@
+{
+  "design_system": {
+    "brand_identity": {
+      "name": "Plan Alimenticio Personalizado",
+      "voice": "Energetic, Motivating, Fresh, Social-First",
+      "aesthetic": "InstaHealthy",
+      "keywords": ["Vibrant", "Natural", "Energy", "Transformation", "Community"]
+    },
+    "colors": {
+      "palette": {
+        "primary": {
+          "DEFAULT": "#608A1C",
+          "foreground": "#FFFFFF",
+          "description": "Earth Green - Structural elements, success states, borders"
+        },
+        "secondary": {
+          "DEFAULT": "#FF7F2A",
+          "foreground": "#FFFFFF",
+          "description": "Vitamin Orange - Primary CTAs, urgent notifications, energy accents"
+        },
+        "accent": {
+          "DEFAULT": "#A0D940",
+          "foreground": "#1a1a1a",
+          "description": "Fresh Lime - Highlights, progress bars, active states"
+        },
+        "background": {
+          "DEFAULT": "#FFFFFF",
+          "secondary": "#FAFAF8",
+          "description": "Pure White for cleanliness, Warm Off-White for sections"
+        },
+        "foreground": {
+          "DEFAULT": "#1A1A1A",
+          "muted": "#666666"
+        },
+        "gradients": {
+          "brand": "bg-gradient-to-r from-[#608A1C] to-[#A0D940]",
+          "energy": "bg-gradient-to-r from-[#FF7F2A] to-[#F1C40F]",
+          "text_highlight": "bg-clip-text text-transparent bg-gradient-to-r from-[#608A1C] to-[#FF7F2A]"
+        }
+      }
+    },
+    "typography": {
+      "font_family": {
+        "headings": ["Outfit", "sans-serif"],
+        "body": ["Manrope", "sans-serif"],
+        "accent": ["Covered By Your Grace", "cursive"]
+      },
+      "styles": {
+        "h1": "font-heading text-4xl md:text-6xl font-bold tracking-tight leading-none",
+        "h2": "font-heading text-3xl md:text-4xl font-semibold tracking-tight",
+        "h3": "font-heading text-2xl font-semibold text-primary",
+        "body": "font-body text-base md:text-lg leading-relaxed text-foreground/80",
+        "label": "font-body text-sm font-bold uppercase tracking-widest text-muted-foreground",
+        "price": "font-heading text-5xl font-bold text-primary tracking-tighter"
+      }
+    },
+    "layout_strategy": {
+      "spacing": {
+        "container_padding": "p-6 md:p-12",
+        "section_gap": "gap-8 md:gap-16",
+        "card_padding": "p-6 md:p-8"
+      },
+      "radius": {
+        "default": "rounded-2xl",
+        "button": "rounded-full",
+        "card": "rounded-3xl"
+      },
+      "shadows": {
+        "card": "shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-shadow duration-300",
+        "button": "shadow-[0_4px_14px_0_rgba(255,127,42,0.39)] hover:shadow-[0_6px_20px_rgba(255,127,42,0.23)]"
+      }
+    },
+    "visual_enhancers": {
+      "textures": "Use subtle grain overlay on solid green backgrounds to avoid flat 'tech' look.",
+      "glassmorphism": "backdrop-blur-xl bg-white/80 border border-white/20 shadow-sm",
+      "shapes": "Use organic blobs in background with opacity-20 for 'Freshness' vibe."
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-secondary hover:bg-secondary/90 text-white rounded-full px-8 py-4 font-bold shadow-button transform hover:-translate-y-1 transition-all",
+      "secondary": "bg-white border-2 border-primary text-primary hover:bg-primary/5 rounded-full px-8 py-4 font-bold transition-colors",
+      "ghost": "text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-full px-6 py-3 font-medium"
+    },
+    "cards": {
+      "feature": "bg-white rounded-3xl p-8 border border-border/50 shadow-card hover:border-primary/20 transition-all group",
+      "plan": "bg-gradient-to-br from-white to-orange-50 rounded-3xl p-8 border-2 border-transparent hover:border-secondary transition-all relative overflow-hidden"
+    },
+    "inputs": {
+      "text": "h-14 bg-background border-2 border-input focus:border-primary rounded-xl px-6 text-lg transition-colors placeholder:text-muted-foreground/50",
+      "select": "h-14 bg-background border-2 border-input focus:border-primary rounded-xl px-6 text-lg"
+    },
+    "navigation": {
+      "nav_link": "text-foreground/80 hover:text-primary font-bold text-lg transition-colors"
+    },
+    "feedback": {
+      "success": "bg-primary/10 text-primary border border-primary/20 rounded-xl p-4 flex items-center gap-3",
+      "error": "bg-red-50 text-red-600 border border-red-100 rounded-xl p-4 flex items-center gap-3"
+    }
+  },
+  "assets": {
+    "image_urls": {
+      "hero_bg": "https://images.pexels.com/photos/7991909/pexels-photo-7991909.jpeg",
+      "hero_food_bowl": "https://images.pexels.com/photos/4099235/pexels-photo-4099235.jpeg",
+      "ingredients_splash": "https://images.pexels.com/photos/3978830/pexels-photo-3978830.jpeg",
+      "active_lifestyle": "https://images.pexels.com/photos/8346681/pexels-photo-8346681.jpeg",
+      "transformation_before": "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=2070&auto=format&fit=crop",
+      "transformation_after": "https://images.unsplash.com/photo-1548690312-e3b507d8c110?q=80&w=1974&auto=format&fit=crop"
+    },
+    "icons": {
+      "library": "lucide-react",
+      "style": "Stroke width 2px, rounded ends"
+    }
+  },
+  "pages": {
+    "landing": {
+      "hero": {
+        "layout": "Split screen or Center Focus",
+        "headline_style": "text-5xl md:text-7xl font-heading font-extrabold tracking-tight text-foreground",
+        "highlight_text": "Use 'text_highlight' gradient for key phrases like 'Mejor Versión' or 'Comer Rico'",
+        "cta_button": "Large Pill Button with ArrowRight icon"
+      },
+      "features": {
+        "layout": "Grid of 3 cards with oversized icons and vibrant hover states"
+      }
+    },
+    "questionnaire": {
+      "layout": "Centered single-column, max-w-2xl",
+      "progress_bar": "Fixed at top, h-2, gradient-brand",
+      "option_cards": "Grid-cols-2, aspect-square selection cards with icons. Active state: ring-4 ring-primary bg-primary/5"
+    },
+    "dashboard": {
+      "layout": "Bento Grid (Grid-cols-1 md:grid-cols-4 gap-6)",
+      "widgets": {
+        "daily_plan": "col-span-2 row-span-2 bg-white rounded-3xl",
+        "macros": "col-span-1 row-span-1 bg-primary/10 rounded-3xl",
+        "water": "col-span-1 row-span-1 bg-blue-50 rounded-3xl text-blue-600",
+        "progress": "col-span-1 md:col-span-2 bg-secondary/10 rounded-3xl"
+      }
+    }
+  },
+  "motion": {
+    "page_transition": {
+      "initial": { "opacity": 0, "y": 20 },
+      "animate": { "opacity": 1, "y": 0 },
+      "exit": { "opacity": 0, "y": -20 },
+      "transition": { "duration": 0.4, "ease": "easeOut" }
+    },
+    "hover_lift": "hover:-translate-y-1 hover:shadow-lg transition-all duration-300",
+    "stagger_children": "stagger-100"
+  },
+  "universal_guidelines": {
+    "do_not": [
+      "Use generic Bootstrap/MUI styles",
+      "Use sharp 90deg corners (always rounded-xl or more)",
+      "Use dark mode by default (Force Light Mode)",
+      "Use 'Inter' font (Use 'Manrope' or 'Outfit')"
+    ],
+    "accessibility": "Ensure text on Orange background is White or Black depending on APCA score. Generally White on #FF7F2A is acceptable for large text, but risky for small text.",
+    "localization": "All text MUST be in Spanish. Currency format: $MXN or general $ symbol."
+  },
+  "instructions_to_main_agent": [
+    "Install 'lucide-react' for icons.",
+    "Install 'framer-motion' for animations.",
+    "Update tailwind.config.js to include the custom colors (primary, secondary, accent) and fonts.",
+    "Import fonts 'Outfit' and 'Manrope' from Google Fonts in index.css.",
+    "For the Questionnaire, build a multi-step form using a state manager or simple React state.",
+    "Use the provided image URLs for the landing page and dashboard placeholders.",
+    "Ensure the 'Pill' button shape is consistent across the app."
+  ]
+}
