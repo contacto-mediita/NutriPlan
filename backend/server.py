@@ -109,6 +109,26 @@ class CheckoutRequest(BaseModel):
 class CheckoutStatusRequest(BaseModel):
     session_id: str
 
+class WeightRecord(BaseModel):
+    id: str
+    user_id: str
+    weight: float
+    date: str
+    notes: Optional[str] = None
+
+class WeightRecordCreate(BaseModel):
+    weight: float
+    date: Optional[str] = None
+    notes: Optional[str] = None
+
+class ProgressStats(BaseModel):
+    initial_weight: Optional[float] = None
+    current_weight: Optional[float] = None
+    target_weight: Optional[float] = None
+    weight_change: Optional[float] = None
+    total_records: int = 0
+    goal: Optional[str] = None
+
 # ============== AUTH HELPERS ==============
 
 def hash_password(password: str) -> str:
