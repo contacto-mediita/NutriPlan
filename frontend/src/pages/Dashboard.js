@@ -111,6 +111,12 @@ const Dashboard = () => {
           </div>
           
           <div className="flex gap-3">
+            <Link to="/progreso">
+              <Button variant="outline" className="rounded-full" data-testid="progress-link-btn">
+                <TrendingUp className="w-4 h-4 mr-2" />
+                Progreso
+              </Button>
+            </Link>
             <Link to="/historial">
               <Button variant="outline" className="rounded-full">
                 <History className="w-4 h-4 mr-2" />
