@@ -28,21 +28,29 @@ const Dashboard = () => {
   const [selectedDay, setSelectedDay] = useState(0);
   const [showPlanModal, setShowPlanModal] = useState(false);
 
+  const [currentWeight, setCurrentWeight] = useState(null);
+
   useEffect(() => {
     fetchData();
   }, []);
 
   const fetchData = async () => {
     try {
-      const [plansRes, questionnaireRes] = await Promise.all([
+      const [plansRes, questionnaireRes, progressRes] = await Promise.all([
         axios.get(`${API}/meal-plans`),
-        axios.get(`${API}/questionnaire`)
+        axios.get(`${API}/questionnaire`),
+        axios.get(`${API}/progress/stats`)
       ]);
       
       if (plansRes.data.length > 0) {
         setCurrentPlan(plansRes.data[0]);
       }
       setQuestionnaire(questionnaireRes.data);
+      
+      // Get current weight from progress stats
+      if (progressRes.data.current_weight) {
+        setCurrentWeight(progressRes.data.current_weight);
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
