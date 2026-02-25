@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { 
   Utensils, Calendar, Zap, Droplets, Target, Clock, 
   ChevronRight, Plus, History, AlertCircle, Sparkles, TrendingUp,
-  ShoppingCart, Dumbbell, Eye
+  ShoppingCart, Dumbbell, Eye, Scale, Ruler, Timer, Flag
 } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
