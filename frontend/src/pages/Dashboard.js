@@ -398,6 +398,30 @@ const Dashboard = () => {
                   <span className="text-sm font-medium">Registrar mi peso</span>
                   <ChevronRight className="w-4 h-4" />
                 </Link>
+                {currentPlan && (
+                  <>
+                    <button
+                      onClick={() => setShowPlanModal(true)}
+                      className="flex items-center justify-between p-3 bg-white/10 rounded-xl hover:bg-white/20 transition-colors w-full"
+                    >
+                      <span className="text-sm font-medium flex items-center gap-2">
+                        <ShoppingCart className="w-4 h-4" />
+                        Lista del super
+                      </span>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => setShowPlanModal(true)}
+                      className="flex items-center justify-between p-3 bg-white/10 rounded-xl hover:bg-white/20 transition-colors w-full"
+                    >
+                      <span className="text-sm font-medium flex items-center gap-2">
+                        <Dumbbell className="w-4 h-4" />
+                        Guía de ejercicios
+                      </span>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </>
+                )}
                 <Link 
                   to="/cuestionario"
                   className="flex items-center justify-between p-3 bg-white/10 rounded-xl hover:bg-white/20 transition-colors"
