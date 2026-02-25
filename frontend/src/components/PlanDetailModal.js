@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Utensils, ShoppingCart, Dumbbell, Home, Building2, 
-  ChevronDown, ChevronUp, Clock, Repeat, Timer, X
+  ChevronDown, ChevronUp, Clock, Repeat, Timer, X, Download, Loader2
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { Button } from './ui/button';
 import {
   Dialog,
@@ -18,9 +19,12 @@ import {
   TabsTrigger,
 } from './ui/tabs';
 
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
 const PlanDetailModal = ({ plan, isOpen, onClose }) => {
   const [selectedDay, setSelectedDay] = useState(0);
   const [expandedMeal, setExpandedMeal] = useState(null);
+  const [downloading, setDownloading] = useState(false);
 
   if (!plan) return null;
 
