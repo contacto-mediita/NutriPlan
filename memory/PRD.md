@@ -12,6 +12,22 @@ Aplicación web para crear planes alimenticios personalizados con membresía/pag
 
 ## Lo Implementado (Feb 2026)
 
+### Dashboard Mejorado
+- **Mi Objetivo:** Muestra el objetivo principal del usuario con objetivos secundarios
+- **Índice de Masa Corporal (IMC):**
+  - Cálculo: peso / (estatura/100)²
+  - Categorías con colores:
+    - Bajo peso (<18.5): Azul
+    - Normal (18.5-25): Verde
+    - Sobrepeso (25-30): Amarillo
+    - Obesidad (>30): Rojo
+- **Tiempo Estimado para cumplir objetivo:**
+  - Para bajar de peso: Calcula semanas hasta peso ideal (IMC 22)
+  - Para aumentar masa: Calcula semanas hasta +10% del peso actual
+  - Fórmula semanal: 0.5 + (días_ejercicio × 0.1) kg/semana
+- **Barra de Progreso:** Muestra peso actual → peso meta
+- **Widget de Hidratación:** Meta de agua basada en peso y objetivo
+
 ### Backend
 - Auth: register, login, me endpoints
 - Cuestionario: 9 etapas completas (incluyendo aviso legal + WhatsApp)
@@ -42,12 +58,11 @@ Aplicación web para crear planes alimenticios personalizados con membresía/pag
   7. Hábitos
   8. Alimentación
   9. Consumo Fuera
-- Dashboard con macros y plan semanal
-- **Widget de Hidratación:**
-  - Vasos visuales interactivos
-  - Meta basada en peso y objetivo (30-40ml por kg)
-  - Persistencia en base de datos
-  - Botones +/- para agregar/quitar vasos
+- **Dashboard con:**
+  - Objetivo, IMC y Tiempo Estimado
+  - Widget de Hidratación interactivo
+  - Macros y plan semanal
+  - Recordatorios In-App
 - **Modal de Plan Completo mejorado:**
   - Menú con selector de 3 opciones por comida
   - Lista del Super con checkboxes de cumplimiento
@@ -55,7 +70,6 @@ Aplicación web para crear planes alimenticios personalizados con membresía/pag
   - Botón Descargar PDF
 - Pricing: 4 planes + banner trial gratuito
 - Página de Progreso con gráficas
-- Sistema de Recordatorios In-App
 - **Páginas Legales:**
   - Términos y Condiciones
   - Aviso de Privacidad
@@ -68,46 +82,34 @@ Aplicación web para crear planes alimenticios personalizados con membresía/pag
 | Quincena | $199 MXN | 15 días |
 | Mes | $349 MXN | 30 días |
 
-### Estructura del Plan Alimenticio (Nuevo Formato)
-- **4 comidas por día:** Desayuno, Comida, Snack, Cena
-- **3 opciones por comida:**
-  - Recomendado: Opción principal más nutritiva
-  - Rápido: Para días con poco tiempo
-  - Económico: Ingredientes más accesibles
-- Cada opción incluye:
-  - Nombre del platillo
-  - Ingredientes con cantidades
-  - Pasos de preparación
-  - Tiempo estimado
-  - Tips y sustituciones
-- **Lista del Super con Checkboxes:**
-  - 7 categorías: Proteínas, Lácteos, Cereales, Verduras, Frutas, Grasas/Semillas, Básicos
-  - Progreso visual (porcentaje completado)
-  - Persistencia en localStorage por plan
-- **Guía de Ejercicios Mejorada:**
-  - Rutina en Casa (4 días)
-  - Rutina en Gimnasio (4 días)
-  - Descripción del objetivo de cada rutina
-  - Lista de beneficios
-  - Checklist de ejercicios completados
-  - Iconos visuales por ejercicio
-  - Cardio recomendado
+### Cálculos Implementados
 
-### Sistema de Hidratación
-- **Cálculo de meta diaria:**
-  - Bajar de peso: peso × 40ml (más agua para metabolismo)
-  - Aumentar masa: peso × 38ml (hidratación para síntesis proteica)
-  - General: peso × 33ml
-  - Default sin cuestionario: 8 vasos (2L)
-- **Interfaz visual:**
-  - Vasos interactivos (click para llenar)
-  - Barra de progreso
-  - Contador de vasos/ml
-  - Info de meta personalizada
+#### IMC (Índice de Masa Corporal)
+```javascript
+BMI = peso / (estatura/100)²
+// Ejemplo: 85kg / (175cm/100)² = 85 / 3.0625 = 27.8
+```
 
-### Documentos Legales
-- **Términos y Condiciones:** Establece que es una guía educativa, no servicio médico
-- **Aviso de Privacidad:** Datos no usados para fines comerciales ni compartidos con terceros
+#### Meta de Hidratación
+```javascript
+// Bajar de peso: peso × 40ml
+// Aumentar masa: peso × 38ml
+// General: peso × 33ml
+// Vasos = ml_total / 250
+```
+
+#### Tiempo Estimado
+```javascript
+// Bajar de peso:
+pesoIdeal = 22 * (estatura_m²)
+cambioSemanal = 0.5 + (diasEjercicio × 0.1)
+semanas = (pesoActual - pesoIdeal) / cambioSemanal
+
+// Aumentar masa:
+pesoMeta = pesoActual × 1.1
+cambioSemanal = 0.25 + (diasEjercicio × 0.05)
+semanas = (pesoMeta - pesoActual) / cambioSemanal
+```
 
 ## User Personas
 1. Persona buscando bajar de peso - Plan hipocalórico + más hidratación
@@ -123,45 +125,47 @@ Aplicación web para crear planes alimenticios personalizados con membresía/pag
 - [x] Auth JWT
 - [x] Plan trial gratuito
 - [x] Seguimiento de progreso
-- [x] Lista del super
-- [x] Guía de ejercicios
+- [x] Lista del super con checkboxes
+- [x] Guía de ejercicios con checklist
 - [x] Términos y condiciones
 - [x] Aviso de privacidad
 - [x] Campo WhatsApp en cuestionario
 - [x] Exportación PDF del plan
 - [x] Notificaciones/recordatorios In-App
 - [x] Widget de hidratación
-- [x] Checkboxes en lista del super
 - [x] 3 opciones por comida en el plan
-- [x] Checklist de ejercicios
 - [x] Descripción de beneficios de rutinas
+- [x] Objetivo, IMC y Tiempo Estimado en Dashboard
 
 ### P1 (Siguiente)
 - [ ] Login con Facebook (requiere FACEBOOK_APP_ID y FACEBOOK_APP_SECRET)
 - [ ] Notificaciones por Email (requiere RESEND_API_KEY)
 - [ ] Notificaciones por WhatsApp (requiere credenciales Twilio)
-- [ ] Infografía/imágenes de ejercicios (iconos más elaborados)
+- [ ] Infografía/imágenes de ejercicios elaboradas
 
 ### P2 (Futuro)
 - [ ] Integración con apps de fitness
 - [ ] Recetas con video (IA video generation)
 - [ ] Panel de admin
+- [ ] Sistema de logros/badges
 
 ## Archivos Clave
 - `backend/server.py` - API principal (~1200 líneas)
 - `frontend/src/pages/Questionnaire.js` - Cuestionario 9 etapas
-- `frontend/src/pages/Dashboard.js` - Panel principal con widget de hidratación
+- `frontend/src/pages/Dashboard.js` - Panel principal con IMC, objetivo, hidratación
 - `frontend/src/components/PlanDetailModal.js` - Modal con plan completo, checkboxes, 3 opciones
 - `frontend/src/components/HydrationWidget.js` - Widget de hidratación interactivo
 - `frontend/src/components/ReminderNotifications.js` - Sistema de recordatorios
-
-## Integraciones Pendientes (Requieren API Keys del Usuario)
-- **Resend:** Para notificaciones por email
-- **Twilio:** Para notificaciones por WhatsApp
-- **Facebook:** Para login social
 
 ## Testing Reports
 - `/app/test_reports/iteration_1.json` - Tests iniciales
 - `/app/test_reports/iteration_2.json` - Tests de progreso
 - `/app/test_reports/iteration_3.json` - Tests PDF y WhatsApp
 - `/app/test_reports/iteration_4.json` - Tests hidratación y checkboxes
+- `/app/test_reports/iteration_5.json` - Tests IMC, objetivo y tiempo estimado
+
+## Credenciales de Prueba
+- **Email:** dashboard_full_test_001@test.com
+- **Password:** testpass123
+- **Datos:** peso=85kg, estatura=175cm, objetivo='Bajar de peso', dias_ejercicio=4
+- **Resultados:** IMC=27.8 (Sobrepeso), Tiempo=20 semanas, Meta=67.4kg
