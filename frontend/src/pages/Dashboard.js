@@ -91,6 +91,80 @@ const Dashboard = () => {
     return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
   };
 
+  // Calculate BMI
+  const calculateBMI = () => {
+    if (!questionnaire?.data) return null;
+    const peso = questionnaire.data.peso;
+    const estatura = questionnaire.data.estatura / 100; // Convert cm to m
+    if (!peso || !estatura) return null;
+    return (peso / (estatura * estatura)).toFixed(1);
+  };
+
+  // Get BMI category and color
+  const getBMICategory = (bmi) => {
+    if (!bmi) return { label: '--', color: 'text-gray-400', bg: 'bg-gray-100' };
+    const value = parseFloat(bmi);
+    if (value < 18.5) return { label: 'Bajo peso', color: 'text-blue-600', bg: 'bg-blue-100' };
+    if (value < 25) return { label: 'Normal', color: 'text-green-600', bg: 'bg-green-100' };
+    if (value < 30) return { label: 'Sobrepeso', color: 'text-yellow-600', bg: 'bg-yellow-100' };
+    return { label: 'Obesidad', color: 'text-red-600', bg: 'bg-red-100' };
+  };
+
+  // Calculate estimated time to reach goal
+  const calculateEstimatedTime = () => {
+    if (!questionnaire?.data) return null;
+    
+    const peso = questionnaire.data.peso;
+    const estatura = questionnaire.data.estatura / 100;
+    const objetivo = questionnaire.data.objetivo_principal?.toLowerCase() || '';
+    const diasEjercicio = questionnaire.data.dias_ejercicio || 0;
+    
+    if (!peso || !estatura) return null;
+    
+    // Calculate ideal weight based on BMI 22 (middle of healthy range)
+    const pesoIdeal = 22 * (estatura * estatura);
+    const diferencia = Math.abs(peso - pesoIdeal);
+    
+    // Estimate weekly change based on objective and exercise
+    let weeklyChange = 0;
+    
+    if (objetivo.includes('bajar')) {
+      // Weight loss: 0.5-1kg per week depending on exercise
+      weeklyChange = 0.5 + (diasEjercicio * 0.1); // Max ~1kg/week with 5 days exercise
+      const weeksNeeded = diferencia / weeklyChange;
+      return {
+        weeks: Math.ceil(weeksNeeded),
+        targetWeight: pesoIdeal.toFixed(1),
+        weeklyChange: weeklyChange.toFixed(2),
+        direction: 'bajar'
+      };
+    } else if (objetivo.includes('aumentar') || objetivo.includes('masa')) {
+      // Muscle gain: 0.25-0.5kg per week
+      weeklyChange = 0.25 + (diasEjercicio * 0.05); // Max ~0.5kg/week
+      const targetWeight = peso + (peso * 0.1); // Target 10% more
+      const weeksNeeded = (targetWeight - peso) / weeklyChange;
+      return {
+        weeks: Math.ceil(weeksNeeded),
+        targetWeight: targetWeight.toFixed(1),
+        weeklyChange: weeklyChange.toFixed(2),
+        direction: 'aumentar'
+      };
+    } else if (objetivo.includes('mantener')) {
+      return {
+        weeks: 0,
+        targetWeight: peso.toFixed(1),
+        weeklyChange: '0',
+        direction: 'mantener'
+      };
+    }
+    
+    return null;
+  };
+
+  const bmi = calculateBMI();
+  const bmiCategory = getBMICategory(bmi);
+  const estimatedTime = calculateEstimatedTime();
+
   if (loading) {
     return (
       <div className="min-h-screen bg-brand-cream flex items-center justify-center">
