@@ -335,19 +335,22 @@ const Dashboard = () => {
                   </span>
                 </div>
                 <div className="relative h-3 bg-white rounded-full overflow-hidden">
+                  {/* Progress starts at 5% to show user has started their journey */}
                   <motion.div
                     initial={{ width: 0 }}
-                    animate={{ 
-                      width: estimatedTime.direction === 'bajar' 
-                        ? `${Math.min(100, Math.max(0, ((questionnaire.data.peso - parseFloat(estimatedTime.targetWeight)) / (questionnaire.data.peso - parseFloat(estimatedTime.targetWeight))) * 100))}%`
-                        : '5%' // Starting point for gaining
-                    }}
+                    animate={{ width: '5%' }}
                     transition={{ duration: 1, ease: "easeOut" }}
                     className="absolute inset-y-0 left-0 bg-gradient-to-r from-brand-green to-brand-lime rounded-full"
                   />
                 </div>
                 <p className="text-xs text-muted-foreground mt-2 text-center">
                   💪 Con tu plan de {questionnaire.data.dias_ejercicio || 0} días de ejercicio por semana
+                  {estimatedTime.direction === 'bajar' && (
+                    <span className="block mt-1">🔥 Déficit calórico + ejercicio = {estimatedTime.weeklyChange}kg/semana</span>
+                  )}
+                  {estimatedTime.direction === 'aumentar' && (
+                    <span className="block mt-1">🍽️ Superávit calórico + entrenamiento = {estimatedTime.weeklyChange}kg/semana</span>
+                  )}
                 </p>
               </div>
             )}
