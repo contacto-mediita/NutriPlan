@@ -1,6 +1,7 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Utensils, Menu, X, LogOut, User, LayoutDashboard } from 'lucide-react';
-import { useState } from 'react';
+import { Utensils, Menu, X, LogOut, User, LayoutDashboard, Shield } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { Button } from './ui/button';
 import {
@@ -11,11 +12,29 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
 const Navbar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      checkAdminStatus();
+    }
+  }, [user]);
+
+  const checkAdminStatus = async () => {
+    try {
+      const res = await axios.get(`${API}/admin/check`);
+      setIsAdmin(res.data.is_admin);
+    } catch (error) {
+      setIsAdmin(false);
+    }
+  };
 
   const handleLogout = () => {
     logout();
