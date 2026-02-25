@@ -400,6 +400,9 @@ const Dashboard = () => {
                           <p className="text-xs text-muted-foreground mt-1">
                             Meta: {estimatedTime.targetWeight}kg ({estimatedTime.weeklyChange}kg/semana)
                           </p>
+                          {estimatedTime.isCustomGoal && (
+                            <span className="text-xs text-purple-500 font-medium">Meta personalizada</span>
+                          )}
                         </>
                       )}
                     </>
