@@ -267,15 +267,22 @@ const Progress = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="bg-white rounded-2xl p-5 shadow-sm"
+            className="bg-white rounded-2xl p-5 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+            onClick={() => setShowGoalModal(true)}
           >
-            <div className="flex items-center gap-2 mb-2">
-              <Target className="w-5 h-5 text-purple-500" />
-              <span className="text-sm text-muted-foreground">Meta</span>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Target className="w-5 h-5 text-purple-500" />
+                <span className="text-sm text-muted-foreground">Meta</span>
+              </div>
+              <span className="text-xs text-purple-500 font-medium">Editar</span>
             </div>
             <p className="text-2xl font-heading font-bold text-foreground">
-              {stats?.target_weight ? `${stats.target_weight} kg` : '--'}
+              {getEffectiveTarget() ? `${getEffectiveTarget()} kg` : '--'}
             </p>
+            {customGoal?.is_custom && (
+              <span className="text-xs text-purple-500">Meta personalizada</span>
+            )}
           </motion.div>
 
           <motion.div
