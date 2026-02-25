@@ -366,6 +366,9 @@ const Dashboard = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Hydration Widget */}
+            <HydrationWidget />
+
             {/* Recommendations */}
             <div className="bg-white rounded-3xl p-6 shadow-sm">
               <h3 className="text-lg font-heading font-bold text-foreground mb-4">
