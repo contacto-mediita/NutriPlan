@@ -874,9 +874,6 @@ Responde en formato JSON:
     "cardio_recomendado": "30 minutos de caminata o trote ligero 3 veces por semana"
   }}
 }}"""
-    "cardio_recomendado": "30 minutos de caminata o trote 3 veces por semana"
-  }}
-}}"""
     
     try:
         chat = LlmChat(
