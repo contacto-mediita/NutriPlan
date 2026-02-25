@@ -329,6 +329,79 @@ async def get_progress_stats(current_user: dict = Depends(get_current_user)):
         goal=goal
     )
 
+class UpdateGoalRequest(BaseModel):
+    target_weight: float
+    goal_type: str  # 'bajar', 'mantener', 'aumentar'
+
+@api_router.put("/progress/goal")
+async def update_weight_goal(data: UpdateGoalRequest, current_user: dict = Depends(get_current_user)):
+    """Update user's weight goal"""
+    
+    # Save the custom goal
+    await db.user_goals.update_one(
+        {"user_id": current_user["id"]},
+        {"$set": {
+            "user_id": current_user["id"],
+            "target_weight": data.target_weight,
+            "goal_type": data.goal_type,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }},
+        upsert=True
+    )
+    
+    return {"message": "Meta actualizada", "target_weight": data.target_weight, "goal_type": data.goal_type}
+
+@api_router.get("/progress/goal")
+async def get_weight_goal(current_user: dict = Depends(get_current_user)):
+    """Get user's custom weight goal"""
+    
+    # First check if user has a custom goal
+    custom_goal = await db.user_goals.find_one(
+        {"user_id": current_user["id"]},
+        {"_id": 0}
+    )
+    
+    if custom_goal:
+        return {
+            "target_weight": custom_goal.get("target_weight"),
+            "goal_type": custom_goal.get("goal_type"),
+            "is_custom": True
+        }
+    
+    # Fall back to calculated goal from questionnaire
+    questionnaire = await db.questionnaire_responses.find_one(
+        {"user_id": current_user["id"]},
+        {"_id": 0},
+        sort=[("created_at", -1)]
+    )
+    
+    if not questionnaire:
+        return {"target_weight": None, "goal_type": None, "is_custom": False}
+    
+    q_data = questionnaire.get("data", {})
+    initial_weight = q_data.get("peso")
+    goal = q_data.get("objetivo_principal", "").lower()
+    
+    target_weight = None
+    goal_type = "mantener"
+    
+    if initial_weight:
+        if "bajar" in goal:
+            target_weight = initial_weight * 0.9
+            goal_type = "bajar"
+        elif "aumentar" in goal or "masa" in goal:
+            target_weight = initial_weight * 1.05
+            goal_type = "aumentar"
+        else:
+            target_weight = initial_weight
+            goal_type = "mantener"
+    
+    return {
+        "target_weight": round(target_weight, 1) if target_weight else None,
+        "goal_type": goal_type,
+        "is_custom": False
+    }
+
 # ============== HYDRATION TRACKING ==============
 
 class HydrationRecord(BaseModel):
