@@ -432,20 +432,32 @@ const Pricing = () => {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl"
+                    className="p-4 bg-gray-50 rounded-xl"
                   >
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                      index % 2 === 0 ? 'bg-brand-green/10' : 'bg-brand-orange/10'
-                    }`}>
-                      <Utensils className={`w-5 h-5 ${index % 2 === 0 ? 'text-brand-green' : 'text-brand-orange'}`} />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <span className="text-xs font-bold text-muted-foreground uppercase">{meal.tipo}</span>
-                        <span className="text-sm font-medium text-brand-orange">{meal.calorias} kcal</span>
+                    <div className="flex items-start gap-4">
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                        index % 2 === 0 ? 'bg-brand-green/10' : 'bg-brand-orange/10'
+                      }`}>
+                        <Utensils className={`w-5 h-5 ${index % 2 === 0 ? 'text-brand-green' : 'text-brand-orange'}`} />
                       </div>
-                      <h5 className="font-semibold text-foreground">{meal.nombre}</h5>
-                      <p className="text-sm text-muted-foreground">{meal.ingredientes?.join(', ')}</p>
+                      <div className="flex-1">
+                        <div className="flex justify-between items-start">
+                          <span className="text-xs font-bold text-muted-foreground uppercase">{meal.tipo}</span>
+                          {meal.calorias && <span className="text-sm font-medium text-brand-orange">{meal.calorias} kcal</span>}
+                        </div>
+                        <h5 className="font-semibold text-foreground">{meal.nombre}</h5>
+                        <p className="text-sm text-muted-foreground">
+                          {Array.isArray(meal.ingredientes) 
+                            ? meal.ingredientes.map(ing => 
+                                typeof ing === 'object' ? `${ing.item} (${ing.cantidad})` : ing
+                              ).join(', ')
+                            : ''
+                          }
+                        </p>
+                        {meal.tip && (
+                          <p className="text-xs text-brand-green mt-2 italic bg-brand-green/5 p-2 rounded">💡 {meal.tip}</p>
+                        )}
+                      </div>
                     </div>
                   </motion.div>
                 ))}
