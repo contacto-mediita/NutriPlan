@@ -405,7 +405,11 @@ def main():
         tester.test_trial_meal_plan,
         tester.test_trial_duplicate_prevention,
         tester.test_get_meal_plans,
-        tester.test_payment_checkout_creation
+        tester.test_payment_checkout_creation,
+        tester.test_add_weight_record,
+        tester.test_get_weight_records,
+        tester.test_get_progress_stats,
+        tester.test_delete_weight_record
     ]
     
     for test in tests:
