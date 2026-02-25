@@ -599,27 +599,70 @@ REQUERIMIENTOS CALCULADOS:
 - Carbohidratos: {macros['carbohidratos']}g
 - Grasas: {macros['grasas']}g
 
-Genera un plan alimenticio estructurado con:
-1. Plan para 7 días (lunes a domingo)
-2. Para cada día incluye: desayuno, snack mañana, comida, snack tarde, cena
-3. Para cada comida incluye: nombre del platillo, ingredientes principales, calorías aproximadas
-4. Incluye 5 recomendaciones personalizadas basadas en sus objetivos y condiciones
+Genera un plan alimenticio estructurado siguiendo el formato INSTAHEALTHY:
 
-Responde en formato JSON con esta estructura:
+ESTRUCTURA:
+1. Plan para 7 días (Día 1 a Día 7)
+2. Para cada día incluye exactamente 4 comidas: Desayuno, Comida, Snack, Cena
+3. Para cada comida incluye:
+   - Nombre del platillo creativo y apetitoso
+   - Lista de ingredientes con cantidades específicas (para 1 porción)
+   - Preparación paso a paso (3-5 pasos claros)
+   - Tip o sustitución útil
+4. NO incluir Snack AM ni Snack PM, solo un Snack entre comida y cena
+5. Incluye 5 recomendaciones personalizadas
+6. Genera una lista del super organizada por categorías
+
+Responde en formato JSON:
 {{
   "dias": [
     {{
-      "dia": "Lunes",
+      "dia": "Día 1",
       "comidas": [
-        {{"tipo": "Desayuno", "nombre": "...", "ingredientes": ["..."], "calorias": 000}},
-        {{"tipo": "Snack AM", "nombre": "...", "ingredientes": ["..."], "calorias": 000}},
-        {{"tipo": "Comida", "nombre": "...", "ingredientes": ["..."], "calorias": 000}},
-        {{"tipo": "Snack PM", "nombre": "...", "ingredientes": ["..."], "calorias": 000}},
-        {{"tipo": "Cena", "nombre": "...", "ingredientes": ["..."], "calorias": 000}}
+        {{
+          "tipo": "Desayuno",
+          "nombre": "Nombre apetitoso del platillo",
+          "ingredientes": [
+            {{"item": "ingrediente", "cantidad": "1/2 taza"}},
+            {{"item": "ingrediente2", "cantidad": "1 pieza"}}
+          ],
+          "preparacion": ["Paso 1...", "Paso 2...", "Paso 3..."],
+          "tip": "Tip o sustitución útil"
+        }},
+        {{
+          "tipo": "Comida",
+          "nombre": "...",
+          "ingredientes": [...],
+          "preparacion": [...],
+          "tip": "..."
+        }},
+        {{
+          "tipo": "Snack",
+          "nombre": "...",
+          "ingredientes": [...],
+          "preparacion": [...],
+          "tip": "..."
+        }},
+        {{
+          "tipo": "Cena",
+          "nombre": "...",
+          "ingredientes": [...],
+          "preparacion": [...],
+          "tip": "..."
+        }}
       ]
     }}
   ],
-  "recomendaciones": ["...", "...", "...", "...", "..."]
+  "recomendaciones": ["Recomendación 1 personalizada", "...", "...", "...", "..."],
+  "lista_super": {{
+    "proteinas": ["pechuga de pollo 1 kg", "huevos 18 piezas", "..."],
+    "lacteos": ["leche 2 L", "yogur griego 1 kg", "..."],
+    "cereales": ["avena 500g", "arroz integral 1 kg", "..."],
+    "verduras": ["brócoli 2 piezas", "espinaca 1 bolsa", "..."],
+    "frutas": ["plátano 7 piezas", "manzana 7 piezas", "..."],
+    "grasas_semillas": ["aceite de oliva 500ml", "almendras 200g", "..."],
+    "basicos": ["sal, pimienta, especias al gusto"]
+  }}
 }}"""
     
     try:
