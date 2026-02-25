@@ -24,12 +24,16 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const Progress = () => {
   const [records, setRecords] = useState([]);
   const [stats, setStats] = useState(null);
+  const [customGoal, setCustomGoal] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showGoalModal, setShowGoalModal] = useState(false);
   const [newWeight, setNewWeight] = useState('');
   const [newDate, setNewDate] = useState(new Date().toISOString().split('T')[0]);
   const [newNotes, setNewNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [goalWeight, setGoalWeight] = useState('');
+  const [goalType, setGoalType] = useState('bajar');
 
   useEffect(() => {
     fetchData();
@@ -37,16 +41,46 @@ const Progress = () => {
 
   const fetchData = async () => {
     try {
-      const [recordsRes, statsRes] = await Promise.all([
+      const [recordsRes, statsRes, goalRes] = await Promise.all([
         axios.get(`${API}/progress/weight`),
-        axios.get(`${API}/progress/stats`)
+        axios.get(`${API}/progress/stats`),
+        axios.get(`${API}/progress/goal`)
       ]);
       setRecords(recordsRes.data);
       setStats(statsRes.data);
+      setCustomGoal(goalRes.data);
+      
+      // Pre-fill goal form with current values
+      if (goalRes.data.target_weight) {
+        setGoalWeight(goalRes.data.target_weight.toString());
+        setGoalType(goalRes.data.goal_type || 'bajar');
+      } else if (statsRes.data.target_weight) {
+        setGoalWeight(statsRes.data.target_weight.toString());
+      }
     } catch (error) {
       console.error('Error fetching progress data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleUpdateGoal = async (e) => {
+    e.preventDefault();
+    if (!goalWeight) return;
+
+    setSubmitting(true);
+    try {
+      await axios.put(`${API}/progress/goal`, {
+        target_weight: parseFloat(goalWeight),
+        goal_type: goalType
+      });
+      toast.success('¡Meta actualizada!');
+      setShowGoalModal(false);
+      fetchData();
+    } catch (error) {
+      toast.error('Error al actualizar meta');
+    } finally {
+      setSubmitting(false);
     }
   };
 
