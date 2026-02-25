@@ -8,6 +8,7 @@ class MealPlanAPITester:
         self.base_url = base_url
         self.token = None
         self.user_id = None
+        self.weight_record_id = None
         self.tests_run = 0
         self.tests_passed = 0
         self.test_results = []
