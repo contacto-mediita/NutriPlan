@@ -972,6 +972,180 @@ async def get_meal_plan(plan_id: str, current_user: dict = Depends(get_current_u
         raise HTTPException(status_code=404, detail="Plan no encontrado")
     return plan
 
+# ============== PDF EXPORT ==============
+
+from fastapi.responses import StreamingResponse
+from fpdf import FPDF
+import io
+
+@api_router.get("/meal-plans/{plan_id}/pdf")
+async def export_meal_plan_pdf(plan_id: str, current_user: dict = Depends(get_current_user)):
+    """Export meal plan to PDF"""
+    plan = await db.meal_plans.find_one(
+        {"id": plan_id, "user_id": current_user["id"]},
+        {"_id": 0}
+    )
+    if not plan:
+        raise HTTPException(status_code=404, detail="Plan no encontrado")
+    
+    # Get user info
+    user = await db.users.find_one({"id": current_user["id"]}, {"_id": 0})
+    
+    # Create PDF
+    pdf = FPDF()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    
+    # Title Page
+    pdf.add_page()
+    pdf.set_font('Helvetica', 'B', 24)
+    pdf.cell(0, 20, 'Plan Alimenticio Personalizado', ln=True, align='C')
+    pdf.set_font('Helvetica', '', 14)
+    pdf.cell(0, 10, f'Preparado para: {user.get("name", "Usuario")}', ln=True, align='C')
+    pdf.cell(0, 10, f'Fecha: {plan.get("created_at", "")[:10]}', ln=True, align='C')
+    pdf.ln(10)
+    
+    # Macros Summary
+    pdf.set_font('Helvetica', 'B', 16)
+    pdf.cell(0, 10, 'Resumen Nutricional', ln=True)
+    pdf.set_font('Helvetica', '', 12)
+    pdf.cell(0, 8, f'Calorias objetivo: {plan.get("calories_target", 0)} kcal/dia', ln=True)
+    macros = plan.get("macros", {})
+    pdf.cell(0, 8, f'Proteinas: {macros.get("proteinas", 0)}g | Carbohidratos: {macros.get("carbohidratos", 0)}g | Grasas: {macros.get("grasas", 0)}g', ln=True)
+    pdf.ln(10)
+    
+    # Menu Section
+    plan_data = plan.get("plan_data", {})
+    dias = plan_data.get("dias", [])
+    
+    for dia in dias:
+        pdf.add_page()
+        pdf.set_font('Helvetica', 'B', 18)
+        pdf.set_fill_color(76, 175, 80)
+        pdf.set_text_color(255, 255, 255)
+        pdf.cell(0, 12, f'  {dia.get("dia", "")}', ln=True, fill=True)
+        pdf.set_text_color(0, 0, 0)
+        pdf.ln(5)
+        
+        for comida in dia.get("comidas", []):
+            pdf.set_font('Helvetica', 'B', 14)
+            pdf.set_fill_color(240, 240, 240)
+            pdf.cell(0, 10, f'{comida.get("tipo", "")}: {comida.get("nombre", "")}', ln=True, fill=True)
+            
+            # Ingredientes
+            pdf.set_font('Helvetica', 'B', 11)
+            pdf.cell(0, 7, 'Ingredientes:', ln=True)
+            pdf.set_font('Helvetica', '', 10)
+            ingredientes = comida.get("ingredientes", [])
+            for ing in ingredientes:
+                if isinstance(ing, dict):
+                    ing_text = f'  - {ing.get("item", "")} ({ing.get("cantidad", "")})'
+                else:
+                    ing_text = f'  - {ing}'
+                pdf.cell(0, 6, ing_text, ln=True)
+            
+            # Preparacion
+            preparacion = comida.get("preparacion", [])
+            if preparacion:
+                pdf.set_font('Helvetica', 'B', 11)
+                pdf.cell(0, 7, 'Preparacion:', ln=True)
+                pdf.set_font('Helvetica', '', 10)
+                for i, paso in enumerate(preparacion, 1):
+                    pdf.multi_cell(0, 6, f'  {i}. {paso}')
+            
+            # Tip
+            tip = comida.get("tip", "")
+            if tip:
+                pdf.set_font('Helvetica', 'I', 10)
+                pdf.set_text_color(76, 175, 80)
+                pdf.multi_cell(0, 6, f'  Tip: {tip}')
+                pdf.set_text_color(0, 0, 0)
+            
+            pdf.ln(5)
+    
+    # Shopping List
+    lista_super = plan_data.get("lista_super", {})
+    if lista_super:
+        pdf.add_page()
+        pdf.set_font('Helvetica', 'B', 18)
+        pdf.set_fill_color(255, 152, 0)
+        pdf.set_text_color(255, 255, 255)
+        pdf.cell(0, 12, '  Lista del Supermercado', ln=True, fill=True)
+        pdf.set_text_color(0, 0, 0)
+        pdf.ln(5)
+        
+        category_labels = {
+            "proteinas": "Proteinas",
+            "lacteos": "Lacteos",
+            "cereales": "Cereales y Granos",
+            "verduras": "Verduras",
+            "frutas": "Frutas",
+            "grasas_semillas": "Grasas y Semillas",
+            "basicos": "Basicos"
+        }
+        
+        for category, items in lista_super.items():
+            pdf.set_font('Helvetica', 'B', 12)
+            pdf.cell(0, 8, category_labels.get(category, category), ln=True)
+            pdf.set_font('Helvetica', '', 10)
+            for item in (items or []):
+                pdf.cell(0, 6, f'  [ ] {item}', ln=True)
+            pdf.ln(3)
+    
+    # Exercise Guide
+    guia = plan_data.get("guia_ejercicios", {})
+    if guia:
+        pdf.add_page()
+        pdf.set_font('Helvetica', 'B', 18)
+        pdf.set_fill_color(156, 39, 176)
+        pdf.set_text_color(255, 255, 255)
+        pdf.cell(0, 12, '  Guia de Ejercicios', ln=True, fill=True)
+        pdf.set_text_color(0, 0, 0)
+        pdf.ln(5)
+        
+        if guia.get("descripcion"):
+            pdf.set_font('Helvetica', '', 12)
+            pdf.cell(0, 8, guia["descripcion"], ln=True)
+            pdf.cell(0, 8, f'Dias recomendados: {guia.get("dias_recomendados", 4)} por semana', ln=True)
+            pdf.ln(5)
+        
+        # Casa
+        pdf.set_font('Helvetica', 'B', 14)
+        pdf.cell(0, 10, 'Rutina en Casa', ln=True)
+        for rutina in guia.get("rutina_casa", []):
+            pdf.set_font('Helvetica', 'B', 12)
+            pdf.cell(0, 8, f'{rutina.get("dia", "")} - {rutina.get("duracion", "")}', ln=True)
+            pdf.set_font('Helvetica', '', 10)
+            for ej in rutina.get("ejercicios", []):
+                pdf.cell(0, 6, f'  - {ej["nombre"]}: {ej["series"]}x{ej["repeticiones"]} (descanso: {ej["descanso"]})', ln=True)
+            pdf.ln(3)
+        
+        # Gimnasio
+        pdf.set_font('Helvetica', 'B', 14)
+        pdf.cell(0, 10, 'Rutina en Gimnasio', ln=True)
+        for rutina in guia.get("rutina_gimnasio", []):
+            pdf.set_font('Helvetica', 'B', 12)
+            pdf.cell(0, 8, f'{rutina.get("dia", "")} - {rutina.get("duracion", "")}', ln=True)
+            pdf.set_font('Helvetica', '', 10)
+            for ej in rutina.get("ejercicios", []):
+                pdf.cell(0, 6, f'  - {ej["nombre"]}: {ej["series"]}x{ej["repeticiones"]} (descanso: {ej["descanso"]})', ln=True)
+            pdf.ln(3)
+        
+        if guia.get("cardio_recomendado"):
+            pdf.ln(5)
+            pdf.set_font('Helvetica', 'I', 11)
+            pdf.multi_cell(0, 7, f'Cardio recomendado: {guia["cardio_recomendado"]}')
+    
+    # Output PDF
+    pdf_buffer = io.BytesIO()
+    pdf.output(pdf_buffer)
+    pdf_buffer.seek(0)
+    
+    return StreamingResponse(
+        pdf_buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename=plan-alimenticio-{plan_id[:8]}.pdf"}
+    )
+
 # ============== STRIPE PAYMENTS ==============
 
 PLAN_PRICES = {
