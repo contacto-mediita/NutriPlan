@@ -55,6 +55,7 @@ function AppRoutes() {
       <Route path="/payment-success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
       <Route path="/historial" element={<ProtectedRoute><History /></ProtectedRoute>} />
       <Route path="/progreso" element={<ProtectedRoute><Progress /></ProtectedRoute>} />
+      <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
