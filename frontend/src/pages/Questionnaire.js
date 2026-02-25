@@ -205,13 +205,13 @@ const Questionnaire = () => {
 
               <div className="flex items-center gap-2 mb-6">
                 <FileText className="w-4 h-4 text-muted-foreground" />
-                <a href="#" className="text-brand-green hover:underline text-sm font-medium">
+                <Link to="/terminos" className="text-brand-green hover:underline text-sm font-medium">
                   Términos y Condiciones
-                </a>
+                </Link>
                 <span className="text-muted-foreground">•</span>
-                <a href="#" className="text-brand-green hover:underline text-sm font-medium">
+                <Link to="/privacidad" className="text-brand-green hover:underline text-sm font-medium">
                   Aviso de Privacidad
-                </a>
+                </Link>
               </div>
 
               <div className="border-t border-gray-200 pt-6">
