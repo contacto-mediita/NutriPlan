@@ -364,6 +364,14 @@ const Dashboard = () => {
               <h3 className="text-lg font-heading font-bold mb-4">Acciones Rápidas</h3>
               <div className="space-y-3">
                 <Link 
+                  to="/progreso"
+                  className="flex items-center justify-between p-3 bg-white/10 rounded-xl hover:bg-white/20 transition-colors"
+                  data-testid="quick-action-progress"
+                >
+                  <span className="text-sm font-medium">Registrar mi peso</span>
+                  <ChevronRight className="w-4 h-4" />
+                </Link>
+                <Link 
                   to="/cuestionario"
                   className="flex items-center justify-between p-3 bg-white/10 rounded-xl hover:bg-white/20 transition-colors"
                 >
