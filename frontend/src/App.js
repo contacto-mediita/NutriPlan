@@ -11,6 +11,7 @@ import History from "./pages/History";
 import Progress from "./pages/Progress";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
+import AdminPanel from "./pages/AdminPanel";
 import "./App.css";
 
 const ProtectedRoute = ({ children }) => {
