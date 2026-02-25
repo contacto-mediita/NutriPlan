@@ -309,7 +309,7 @@ const Progress = () => {
         </div>
 
         {/* Progress Bar */}
-        {stats?.initial_weight && stats?.target_weight && (
+        {stats?.initial_weight && getEffectiveTarget() && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -329,7 +329,7 @@ const Progress = () => {
             </div>
             <div className="flex justify-between mt-2 text-sm text-muted-foreground">
               <span>{stats.initial_weight} kg</span>
-              <span className="font-medium text-brand-green">{stats.target_weight} kg</span>
+              <span className="font-medium text-brand-green">{getEffectiveTarget()} kg</span>
             </div>
           </motion.div>
         )}
