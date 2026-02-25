@@ -26,6 +26,7 @@ const Navbar = () => {
 
   const navLinks = user ? [
     { path: '/dashboard', label: 'Dashboard' },
+    { path: '/progreso', label: 'Progreso' },
     { path: '/cuestionario', label: 'Cuestionario' },
     { path: '/precios', label: 'Precios' },
   ] : [
