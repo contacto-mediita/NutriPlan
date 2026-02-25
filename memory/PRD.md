@@ -14,26 +14,35 @@ Aplicación web para crear planes alimenticios personalizados con membresía/pag
 
 ### Backend
 - Auth: register, login, me endpoints
-- Cuestionario: 8 etapas completas
-- Plan Trial: 1 día gratuito con 4 comidas (Desayuno, Snack, Comida, Cena)
-- Plan Completo: Generación con IA de 7+ días
+- Cuestionario: 9 etapas completas (incluyendo aviso legal)
+- Plan Trial: 1 día gratuito con 4 comidas + lista super + guía ejercicios
+- Plan Completo: Generación con IA de 7+ días con todo incluido
 - Stripe: Checkout sessions con 4 planes
-- **NUEVO: Seguimiento de Progreso**
-  - POST/GET/DELETE /api/progress/weight - CRUD registros de peso
-  - GET /api/progress/stats - Estadísticas con cálculo de meta
+- Seguimiento de Progreso: CRUD registros de peso + estadísticas
 
 ### Frontend
 - Landing page vibrante (verde/naranja InstaHealthy)
 - Auth (registro/login)
-- Cuestionario de 8 etapas (una pregunta a la vez)
+- **Cuestionario de 9 etapas:**
+  1. Aviso Legal (Términos y Condiciones)
+  2. Datos Generales
+  3. Objetivos
+  4. Actividad y Rutina
+  5. Salud
+  6. Síntomas
+  7. Hábitos
+  8. Alimentación
+  9. Consumo Fuera
 - Dashboard con macros y plan semanal
+- **Modal de Plan Completo con 3 tabs:**
+  - Menú (días expandibles con ingredientes y preparación)
+  - Lista del Super (por categorías)
+  - Guía de Ejercicios (casa y gimnasio)
 - Pricing: 4 planes + banner trial gratuito
-- Modal de generación trial con resultados
-- **NUEVO: Página de Progreso**
-  - 4 stats cards: Peso inicial, actual, meta, cambio
-  - Barra de progreso hacia meta
-  - Gráfica de evolución (Recharts)
-  - Historial de registros con eliminación
+- Página de Progreso con gráficas
+- **Páginas Legales:**
+  - Términos y Condiciones
+  - Aviso de Privacidad
 
 ### Planes de Precios
 | Plan | Precio | Duración |
@@ -43,47 +52,47 @@ Aplicación web para crear planes alimenticios personalizados con membresía/pag
 | Quincena | $199 MXN | 15 días |
 | Mes | $349 MXN | 30 días |
 
-### Plan de Prueba Gratuito
-- 1 día con 4 comidas
-- Solo 1 vez por usuario
-- Generado con IA (GPT-5.2)
+### Estructura del Plan Alimenticio
+- **4 comidas por día:** Desayuno, Comida, Snack, Cena
+- Ingredientes con cantidades específicas
+- Pasos de preparación
+- Tips y sustituciones
+- **Lista del Super** por categorías:
+  - Proteínas, Lácteos, Cereales, Verduras, Frutas, Grasas/Semillas, Básicos
+- **Guía de Ejercicios:**
+  - Rutina en Casa (4 días)
+  - Rutina en Gimnasio (4 días)
+  - Cardio recomendado
 
-### Sistema de Progreso
-- Meta calculada automáticamente:
-  - "Bajar de peso": -10% del peso inicial
-  - "Aumentar masa": +5% del peso inicial
-  - "Control de peso": mantener
-- Gráfica de evolución con línea de meta
-- Felicitaciones automáticas al alcanzar metas parciales
+### Documentos Legales
+- **Términos y Condiciones:** Establece que es una guía educativa, no servicio médico
+- **Aviso de Privacidad:** Datos no usados para fines comerciales ni compartidos con terceros
 
 ## User Personas
-1. **Persona buscando bajar de peso** - Objetivo principal, plan hipocalórico
-2. **Persona buscando ganar masa** - Plan hipercalórico con más proteína
-3. **Persona con restricciones** - Vegetariano, alergias, medicamentos
+1. Persona buscando bajar de peso - Plan hipocalórico
+2. Persona buscando ganar masa - Plan hipercalórico
+3. Persona con restricciones - Vegetariano, alergias
 
 ## Backlog Priorizado
 
 ### P0 (Completado)
-- [x] Cuestionario 8 etapas
+- [x] Cuestionario 9 etapas con aviso legal
 - [x] Generación plan con IA
 - [x] Sistema de pagos Stripe
 - [x] Auth JWT
 - [x] Plan trial gratuito
-- [x] Seguimiento de progreso con gráficas
+- [x] Seguimiento de progreso
+- [x] Lista del super
+- [x] Guía de ejercicios
+- [x] Términos y condiciones
+- [x] Aviso de privacidad
 
 ### P1 (Siguiente)
-- [ ] Login con Facebook (requiere Facebook App ID)
-- [ ] Lista de compras generada
-- [ ] PDF descargable del plan
+- [ ] Login con Facebook
+- [ ] Exportación PDF del plan
 - [ ] Notificaciones/recordatorios
 
 ### P2 (Futuro)
 - [ ] Integración con apps de fitness
-- [ ] Recetas detalladas con instrucciones
+- [ ] Recetas con video
 - [ ] Panel de admin
-- [ ] Exportar datos de progreso
-
-## Siguientes Pasos
-1. Obtener Facebook App ID para login social
-2. Implementar generación de lista de compras
-3. Agregar exportación PDF
