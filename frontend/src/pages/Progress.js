@@ -230,6 +230,72 @@ const Progress = () => {
               </form>
             </DialogContent>
           </Dialog>
+
+          {/* Goal Edit Modal */}
+          <Dialog open={showGoalModal} onOpenChange={setShowGoalModal}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Target className="w-5 h-5 text-purple-500" />
+                  Cambiar Meta de Peso
+                </DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleUpdateGoal} className="space-y-4 pt-4">
+                <div>
+                  <Label>Peso Meta (kg)</Label>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    value={goalWeight}
+                    onChange={(e) => setGoalWeight(e.target.value)}
+                    placeholder="65.0"
+                    className="h-12 rounded-xl mt-1"
+                    required
+                    data-testid="input-goal-weight"
+                  />
+                </div>
+                <div>
+                  <Label>Tipo de Objetivo</Label>
+                  <div className="grid grid-cols-3 gap-2 mt-2">
+                    {['bajar', 'mantener', 'aumentar'].map((type) => (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() => setGoalType(type)}
+                        className={`p-3 rounded-xl border-2 text-sm font-medium transition-all ${
+                          goalType === type
+                            ? 'border-purple-500 bg-purple-50 text-purple-700'
+                            : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                        }`}
+                      >
+                        {type === 'bajar' ? '📉 Bajar' : type === 'mantener' ? '⚖️ Mantener' : '📈 Subir'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                
+                {stats?.initial_weight && goalWeight && (
+                  <div className="bg-purple-50 rounded-xl p-4">
+                    <p className="text-sm text-purple-700">
+                      <strong>Cambio necesario:</strong> {Math.abs(stats.initial_weight - parseFloat(goalWeight)).toFixed(1)} kg
+                    </p>
+                    <p className="text-xs text-purple-600 mt-1">
+                      De {stats.initial_weight}kg a {goalWeight}kg
+                    </p>
+                  </div>
+                )}
+                
+                <Button 
+                  type="submit" 
+                  disabled={submitting}
+                  className="w-full bg-purple-500 hover:bg-purple-600 rounded-full h-12"
+                  data-testid="submit-goal-btn"
+                >
+                  {submitting ? 'Guardando...' : 'Actualizar Meta'}
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
 
         {/* Stats Cards */}
