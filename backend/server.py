@@ -737,19 +737,24 @@ REQUERIMIENTOS CALCULADOS:
 - Carbohidratos: {macros['carbohidratos']}g
 - Grasas: {macros['grasas']}g
 
-Genera un plan alimenticio estructurado siguiendo el formato INSTAHEALTHY:
+Genera un plan alimenticio estructurado con 3 OPCIONES por cada comida:
 
 ESTRUCTURA:
 1. Plan para 7 días (Día 1 a Día 7)
-2. Para cada día incluye exactamente 4 comidas: Desayuno, Comida, Snack, Cena
-3. Para cada comida incluye:
-   - Nombre del platillo creativo y apetitoso
-   - Lista de ingredientes con cantidades específicas (para 1 porción)
-   - Preparación paso a paso (3-5 pasos claros)
-   - Tip o sustitución útil
-4. NO incluir Snack AM ni Snack PM, solo un Snack entre comida y cena
+2. Para cada día incluye exactamente 4 tiempos de comida: Desayuno, Comida, Snack, Cena
+3. IMPORTANTE: Para CADA tiempo de comida genera 3 OPCIONES diferentes:
+   - Opción 1: Principal (la más recomendada)
+   - Opción 2: Alternativa rápida (para días con poco tiempo)
+   - Opción 3: Alternativa económica (ingredientes más accesibles)
+4. Cada opción debe incluir:
+   - Nombre del platillo creativo
+   - Lista de ingredientes con cantidades específicas
+   - Preparación paso a paso (3-5 pasos)
+   - Tiempo de preparación estimado
+   - Tip útil
 5. Incluye 5 recomendaciones personalizadas
-6. Genera una lista del super organizada por categorías
+6. Lista del super organizada por categorías
+7. Guía de ejercicios con descripción de beneficios
 
 Responde en formato JSON:
 {{
@@ -759,74 +764,88 @@ Responde en formato JSON:
       "comidas": [
         {{
           "tipo": "Desayuno",
-          "nombre": "Nombre apetitoso del platillo",
-          "ingredientes": [
-            {{"item": "ingrediente", "cantidad": "1/2 taza"}},
-            {{"item": "ingrediente2", "cantidad": "1 pieza"}}
-          ],
-          "preparacion": ["Paso 1...", "Paso 2...", "Paso 3..."],
-          "tip": "Tip o sustitución útil"
+          "opciones": [
+            {{
+              "nombre": "Nombre apetitoso",
+              "etiqueta": "Recomendado",
+              "ingredientes": [{{"item": "ingrediente", "cantidad": "1/2 taza"}}],
+              "preparacion": ["Paso 1...", "Paso 2...", "Paso 3..."],
+              "tiempo_prep": "15 min",
+              "tip": "Tip útil"
+            }},
+            {{
+              "nombre": "Alternativa rápida",
+              "etiqueta": "Rápido",
+              "ingredientes": [...],
+              "preparacion": [...],
+              "tiempo_prep": "5 min",
+              "tip": "..."
+            }},
+            {{
+              "nombre": "Alternativa económica",
+              "etiqueta": "Económico",
+              "ingredientes": [...],
+              "preparacion": [...],
+              "tiempo_prep": "10 min",
+              "tip": "..."
+            }}
+          ]
         }},
         {{
           "tipo": "Comida",
-          "nombre": "...",
-          "ingredientes": [...],
-          "preparacion": [...],
-          "tip": "..."
+          "opciones": [...]
         }},
         {{
           "tipo": "Snack",
-          "nombre": "...",
-          "ingredientes": [...],
-          "preparacion": [...],
-          "tip": "..."
+          "opciones": [...]
         }},
         {{
           "tipo": "Cena",
-          "nombre": "...",
-          "ingredientes": [...],
-          "preparacion": [...],
-          "tip": "..."
+          "opciones": [...]
         }}
       ]
     }}
   ],
-  "recomendaciones": ["Recomendación 1 personalizada", "...", "...", "...", "..."],
+  "recomendaciones": ["Recomendación 1", "...", "...", "...", "..."],
   "lista_super": {{
-    "proteinas": ["pechuga de pollo 1 kg", "huevos 18 piezas", "..."],
-    "lacteos": ["leche 2 L", "yogur griego 1 kg", "..."],
-    "cereales": ["avena 500g", "arroz integral 1 kg", "..."],
-    "verduras": ["brócoli 2 piezas", "espinaca 1 bolsa", "..."],
-    "frutas": ["plátano 7 piezas", "manzana 7 piezas", "..."],
-    "grasas_semillas": ["aceite de oliva 500ml", "almendras 200g", "..."],
-    "basicos": ["sal, pimienta, especias al gusto"]
+    "proteinas": ["pechuga de pollo 1 kg", "huevos 18 piezas"],
+    "lacteos": ["leche 2 L", "yogur griego 1 kg"],
+    "cereales": ["avena 500g", "arroz integral 1 kg"],
+    "verduras": ["brócoli 2 piezas", "espinaca 1 bolsa"],
+    "frutas": ["plátano 7 piezas", "manzana 7 piezas"],
+    "grasas_semillas": ["aceite de oliva 500ml", "almendras 200g"],
+    "basicos": ["sal, pimienta, especias"]
   }},
   "guia_ejercicios": {{
-    "descripcion": "Guía de ejercicios para complementar tu plan alimenticio",
+    "descripcion": "Guía de ejercicios para {objetivo.lower()}",
     "dias_recomendados": 4,
     "rutina_casa": [
       {{
         "dia": "Día 1 - Tren Superior",
+        "objetivo_rutina": "Fortalecer pecho, hombros y brazos para mejorar tu postura y fuerza funcional",
+        "beneficios": ["Mejora la postura", "Aumenta fuerza en brazos", "Tonifica pecho y hombros"],
         "ejercicios": [
-          {{"nombre": "Lagartijas", "series": 3, "repeticiones": "12-15", "descanso": "60 seg"}},
-          {{"nombre": "...", "series": 3, "repeticiones": "...", "descanso": "..."}}
+          {{"nombre": "Lagartijas", "series": 3, "repeticiones": "12-15", "descanso": "60 seg", "musculo": "Pecho", "descripcion": "Fortalece pecho y tríceps"}},
+          {{"nombre": "Fondos en silla", "series": 3, "repeticiones": "10-12", "descanso": "60 seg", "musculo": "Tríceps", "descripcion": "Tonifica la parte posterior del brazo"}}
         ],
         "duracion": "30 min",
-        "tips": "Tip para este día"
+        "tips": "Mantén el core activado durante todos los ejercicios"
       }}
     ],
     "rutina_gimnasio": [
       {{
         "dia": "Día 1 - Pecho y Tríceps",
+        "objetivo_rutina": "Desarrollar masa muscular en pecho y tríceps con ejercicios compuestos",
+        "beneficios": ["Aumenta masa muscular", "Mejora fuerza de empuje", "Define el pecho"],
         "ejercicios": [
-          {{"nombre": "Press de banca", "series": 4, "repeticiones": "10-12", "descanso": "90 seg"}},
-          {{"nombre": "...", "series": 3, "repeticiones": "...", "descanso": "..."}}
+          {{"nombre": "Press de banca", "series": 4, "repeticiones": "10-12", "descanso": "90 seg", "musculo": "Pecho", "descripcion": "Ejercicio principal para desarrollo de pecho"}},
+          {{"nombre": "Aperturas", "series": 3, "repeticiones": "12", "descanso": "60 seg", "musculo": "Pecho", "descripcion": "Aísla el pecho para mayor definición"}}
         ],
         "duracion": "45 min",
-        "tips": "Tip para este día"
+        "tips": "Calienta con peso ligero antes de cargar"
       }}
     ],
-    "cardio_recomendado": "30 minutos de caminata o trote ligero 3 veces por semana"
+    "cardio_recomendado": "30 minutos de caminata o trote 3 veces por semana"
   }}
 }}"""
     
