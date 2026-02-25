@@ -114,7 +114,8 @@ const Dashboard = () => {
             <p className="text-muted-foreground">Tu panel de control nutricional</p>
           </div>
           
-          <div className="flex gap-3">
+          <div className="flex gap-3 items-center">
+            <ReminderNotifications questionnaire={questionnaire} />
             <Link to="/progreso">
               <Button variant="outline" className="rounded-full" data-testid="progress-link-btn">
                 <TrendingUp className="w-4 h-4 mr-2" />
