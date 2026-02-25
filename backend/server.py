@@ -701,6 +701,10 @@ async def generate_meal_plan(current_user: dict = Depends(get_current_user)):
     
     api_key = os.environ.get('EMERGENT_LLM_KEY')
     
+    # Get injury/restriction info
+    lesiones = ', '.join(q_data.get('lesiones_restricciones', [])) or 'Ninguna'
+    descripcion_lesion = q_data.get('descripcion_lesion', '')
+    
     prompt = f"""Genera un plan alimenticio semanal personalizado en español para una persona con las siguientes características:
 
 DATOS PERSONALES:
@@ -716,11 +720,14 @@ Objetivos secundarios: {', '.join(q_data.get('objetivos_secundarios', [])) or 'N
 ACTIVIDAD:
 - Trabajo oficina: {'Sí' if q_data.get('trabajo_oficina') else 'No'}
 - Trabajo físico: {'Sí' if q_data.get('trabajo_fisico') else 'No'}
+- Turnos rotativos: {'Sí' if q_data.get('turnos_rotativos') else 'No'}
 - Ejercicio: {q_data.get('ejercicio_adicional', 'No especificado')} - {q_data.get('dias_ejercicio', 0)} días/semana
 
 SALUD:
 - Padecimientos: {', '.join(q_data.get('padecimientos', [])) or 'Ninguno'}
 - Medicamentos controlados: {'Sí' if q_data.get('medicamentos_controlados') else 'No'}
+- Lesiones/Restricciones para ejercicio: {lesiones}
+- Detalle de lesión: {descripcion_lesion or 'N/A'}
 - Síntomas reportados: {', '.join(q_data.get('sintomas', [])) or 'Ninguno'}
 
 HÁBITOS:
@@ -732,6 +739,7 @@ PREFERENCIAS ALIMENTICIAS:
 - Vegetariano: {'Sí' if q_data.get('vegetariano') else 'No'}
 - Alimentos no deseados: {', '.join(q_data.get('alimentos_no_deseados', [])) or 'Ninguno'}
 - Platillo favorito: {q_data.get('platillo_favorito', 'No especificado')}
+- Frecuencia restaurantes: {q_data.get('frecuencia_restaurantes', 'No especificado')}
 - Presupuesto restaurantes: ${q_data.get('ticket_promedio', 0)} promedio
 
 REQUERIMIENTOS CALCULADOS:
@@ -740,24 +748,40 @@ REQUERIMIENTOS CALCULADOS:
 - Carbohidratos: {macros['carbohidratos']}g
 - Grasas: {macros['grasas']}g
 
-Genera un plan alimenticio estructurado con 3 OPCIONES por cada comida:
+Genera un plan alimenticio estructurado con 3 OPCIONES por cada comida y recetas DETALLADAS:
 
-ESTRUCTURA:
+ESTRUCTURA DEL PLAN:
 1. Plan para 7 días (Día 1 a Día 7)
-2. Para cada día incluye exactamente 4 tiempos de comida: Desayuno, Comida, Snack, Cena
-3. IMPORTANTE: Para CADA tiempo de comida genera 3 OPCIONES diferentes:
-   - Opción 1: Principal (la más recomendada)
-   - Opción 2: Alternativa rápida (para días con poco tiempo)
-   - Opción 3: Alternativa económica (ingredientes más accesibles)
-4. Cada opción debe incluir:
-   - Nombre del platillo creativo
-   - Lista de ingredientes con cantidades específicas
-   - Preparación paso a paso (3-5 pasos)
-   - Tiempo de preparación estimado
-   - Tip útil
-5. Incluye 5 recomendaciones personalizadas
-6. Lista del super organizada por categorías
-7. Guía de ejercicios con descripción de beneficios
+2. Para cada día: 4 tiempos de comida: Desayuno, Comida, Snack, Cena
+3. Para CADA comida genera 3 OPCIONES:
+   - Opción 1: Recomendado (la más nutritiva y balanceada)
+   - Opción 2: Rápido (para días con poco tiempo, max 10 min)
+   - Opción 3: Económico (ingredientes accesibles y económicos)
+
+FORMATO DE CADA RECETA (MUY IMPORTANTE):
+- Nombre creativo y apetitoso
+- Lista de ingredientes con cantidades EXACTAS para 1 porción
+- Preparación paso a paso detallada (4-6 pasos claros)
+- Tiempo de preparación
+- SUSTITUCIONES: 2-3 alternativas para ingredientes principales
+- TIP NUTRIPLAN: Consejo práctico relacionado con el objetivo del usuario
+
+RECOMENDACIONES ADICIONALES (personaliza según el perfil):
+Incluye 8-10 recomendaciones específicas sobre:
+- Sueño y descanso
+- Manejo de antojos
+- Planeación de comidas
+- Opciones para comer fuera
+- Guía para restaurantes según el presupuesto
+- Consideraciones por padecimientos (si los hay)
+- Expectativas de progreso realistas
+- Hidratación
+- Suplementación básica (si aplica)
+
+GUÍA DE EJERCICIOS (adapta según lesiones: {lesiones}):
+- Si hay lesiones, EXCLUYE ejercicios que afecten esa zona
+- Incluye alternativas seguras
+- Cada ejercicio debe tener descripción de técnica correcta
 
 Responde en formato JSON:
 {{
@@ -769,47 +793,47 @@ Responde en formato JSON:
           "tipo": "Desayuno",
           "opciones": [
             {{
-              "nombre": "Nombre apetitoso",
+              "nombre": "Overnight Oats Vainilla + Plátano + Chía",
               "etiqueta": "Recomendado",
-              "ingredientes": [{{"item": "ingrediente", "cantidad": "1/2 taza"}}],
-              "preparacion": ["Paso 1...", "Paso 2...", "Paso 3..."],
-              "tiempo_prep": "15 min",
-              "tip": "Tip útil"
-            }},
-            {{
-              "nombre": "Alternativa rápida",
-              "etiqueta": "Rápido",
-              "ingredientes": [...],
-              "preparacion": [...],
-              "tiempo_prep": "5 min",
-              "tip": "..."
-            }},
-            {{
-              "nombre": "Alternativa económica",
-              "etiqueta": "Económico",
-              "ingredientes": [...],
-              "preparacion": [...],
-              "tiempo_prep": "10 min",
-              "tip": "..."
+              "ingredientes": [
+                {{"item": "Avena", "cantidad": "1/2 taza (40g)"}},
+                {{"item": "Leche descremada o vegetal sin azúcar", "cantidad": "3/4 taza"}},
+                {{"item": "Yogurt griego natural", "cantidad": "1/3 taza"}},
+                {{"item": "Plátano", "cantidad": "1/2 pieza (en rodajas)"}},
+                {{"item": "Chía", "cantidad": "1 cda"}},
+                {{"item": "Canela", "cantidad": "1/2 cdita"}},
+                {{"item": "Vainilla", "cantidad": "3-4 gotas"}}
+              ],
+              "preparacion": [
+                "En un frasco, mezcla avena, leche, yogurt, chía, canela y vainilla",
+                "Agrega el plátano en rodajas por encima",
+                "Tapa y refrigera mínimo 4 horas (ideal: toda la noche)",
+                "Antes de comer, mezcla y ajusta la textura con un chorrito extra de leche si lo necesitas"
+              ],
+              "tiempo_prep": "10 min + 4h refrigeración",
+              "sustituciones": [
+                "Plátano: papaya (1 taza) o pera (1/2 pieza en cubos)",
+                "Yogurt griego: kéfir natural (3/4 taza)",
+                "Chía: linaza molida (1 cda)"
+              ],
+              "tip": "Desayuno perfecto para turnos: prepara 2 frascos en 10 minutos y sales con el plan en la bolsa"
             }}
           ]
-        }},
-        {{
-          "tipo": "Comida",
-          "opciones": [...]
-        }},
-        {{
-          "tipo": "Snack",
-          "opciones": [...]
-        }},
-        {{
-          "tipo": "Cena",
-          "opciones": [...]
         }}
       ]
     }}
   ],
-  "recomendaciones": ["Recomendación 1", "...", "...", "...", "..."],
+  "recomendaciones_adicionales": {{
+    "sueno": "Busca 7-8 horas cuando sea posible. Si duermes poco, prioriza cena ligera con proteína",
+    "antojos": "Si aparecen a media tarde, revisa que tu comida tenga proteína + carbo medido",
+    "planeacion": "Elige 2 días a la semana para adelantar: arroz/quinoa + pollo + verduras (2 porciones)",
+    "desayunos_fuera": "Arma 2 opciones base por semana: (1) overnight oats o pudín de chía; (2) sándwich o wrap de pavo",
+    "restaurantes": "Regla simple: 1 proteína a la plancha + 1 verdura + 1 carbo medido. Salsas aparte",
+    "padecimientos": "Consideración específica según condiciones del usuario",
+    "progreso": "Energía más estable en 10-14 días; cambios visibles en 8-12 semanas con constancia",
+    "hidratacion": "Mínimo {int(peso * 35 / 1000)}L de agua al día, más si haces ejercicio",
+    "guia_restaurantes": "En taquería: 3 tacos de maíz con carne asada/pollo, sin fritura; agrega nopales/cebolla/cilantro; evita refresco"
+  }},
   "lista_super": {{
     "proteinas": ["pechuga de pollo 1 kg", "huevos 18 piezas"],
     "lacteos": ["leche 2 L", "yogur griego 1 kg"],
@@ -821,6 +845,7 @@ Responde en formato JSON:
   }},
   "guia_ejercicios": {{
     "descripcion": "Guía de ejercicios para {objetivo.lower()}",
+    "nota_lesiones": "Ejercicios adaptados considerando: {lesiones}",
     "dias_recomendados": 4,
     "rutina_casa": [
       {{
@@ -828,8 +853,7 @@ Responde en formato JSON:
         "objetivo_rutina": "Fortalecer pecho, hombros y brazos para mejorar tu postura y fuerza funcional",
         "beneficios": ["Mejora la postura", "Aumenta fuerza en brazos", "Tonifica pecho y hombros"],
         "ejercicios": [
-          {{"nombre": "Lagartijas", "series": 3, "repeticiones": "12-15", "descanso": "60 seg", "musculo": "Pecho", "descripcion": "Fortalece pecho y tríceps"}},
-          {{"nombre": "Fondos en silla", "series": 3, "repeticiones": "10-12", "descanso": "60 seg", "musculo": "Tríceps", "descripcion": "Tonifica la parte posterior del brazo"}}
+          {{"nombre": "Lagartijas", "series": 3, "repeticiones": "12-15", "descanso": "60 seg", "musculo": "Pecho", "descripcion": "Fortalece pecho y tríceps", "tecnica": "Manos a la altura de hombros, baja controlado hasta que el pecho casi toque el suelo, sube empujando fuerte"}}
         ],
         "duracion": "30 min",
         "tips": "Mantén el core activado durante todos los ejercicios"
@@ -841,13 +865,15 @@ Responde en formato JSON:
         "objetivo_rutina": "Desarrollar masa muscular en pecho y tríceps con ejercicios compuestos",
         "beneficios": ["Aumenta masa muscular", "Mejora fuerza de empuje", "Define el pecho"],
         "ejercicios": [
-          {{"nombre": "Press de banca", "series": 4, "repeticiones": "10-12", "descanso": "90 seg", "musculo": "Pecho", "descripcion": "Ejercicio principal para desarrollo de pecho"}},
-          {{"nombre": "Aperturas", "series": 3, "repeticiones": "12", "descanso": "60 seg", "musculo": "Pecho", "descripcion": "Aísla el pecho para mayor definición"}}
+          {{"nombre": "Press de banca", "series": 4, "repeticiones": "10-12", "descanso": "90 seg", "musculo": "Pecho", "descripcion": "Ejercicio principal para desarrollo de pecho", "tecnica": "Agarra la barra un poco más ancho que los hombros, baja hasta tocar el pecho, empuja de forma explosiva"}}
         ],
         "duracion": "45 min",
         "tips": "Calienta con peso ligero antes de cargar"
       }}
     ],
+    "cardio_recomendado": "30 minutos de caminata o trote ligero 3 veces por semana"
+  }}
+}}"""
     "cardio_recomendado": "30 minutos de caminata o trote 3 veces por semana"
   }}
 }}"""
