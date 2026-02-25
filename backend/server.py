@@ -662,6 +662,33 @@ Responde en formato JSON:
     "frutas": ["plátano 7 piezas", "manzana 7 piezas", "..."],
     "grasas_semillas": ["aceite de oliva 500ml", "almendras 200g", "..."],
     "basicos": ["sal, pimienta, especias al gusto"]
+  }},
+  "guia_ejercicios": {{
+    "descripcion": "Guía de ejercicios para complementar tu plan alimenticio",
+    "dias_recomendados": 4,
+    "rutina_casa": [
+      {{
+        "dia": "Día 1 - Tren Superior",
+        "ejercicios": [
+          {{"nombre": "Lagartijas", "series": 3, "repeticiones": "12-15", "descanso": "60 seg"}},
+          {{"nombre": "...", "series": 3, "repeticiones": "...", "descanso": "..."}}
+        ],
+        "duracion": "30 min",
+        "tips": "Tip para este día"
+      }}
+    ],
+    "rutina_gimnasio": [
+      {{
+        "dia": "Día 1 - Pecho y Tríceps",
+        "ejercicios": [
+          {{"nombre": "Press de banca", "series": 4, "repeticiones": "10-12", "descanso": "90 seg"}},
+          {{"nombre": "...", "series": 3, "repeticiones": "...", "descanso": "..."}}
+        ],
+        "duracion": "45 min",
+        "tips": "Tip para este día"
+      }}
+    ],
+    "cardio_recomendado": "30 minutos de caminata o trote ligero 3 veces por semana"
   }}
 }}"""
     
