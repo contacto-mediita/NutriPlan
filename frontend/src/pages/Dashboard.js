@@ -359,8 +359,13 @@ const Dashboard = () => {
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {questionnaire.data.peso}kg / {questionnaire.data.estatura}cm
+                    {currentWeight || questionnaire.data.peso}kg / {questionnaire.data.estatura}cm
                   </p>
+                  {healthyWeightRange && (
+                    <p className="text-xs text-green-600 mt-0.5">
+                      Rango saludable: {healthyWeightRange.min}-{healthyWeightRange.max}kg
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -393,21 +398,35 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Progress to Goal */}
+            {/* Progress to Goal with Real Data */}
             {estimatedTime && estimatedTime.direction !== 'mantener' && (
               <div className="mt-6 pt-6 border-t border-brand-green/10">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium text-foreground">Progreso hacia tu objetivo</span>
-                  <span className="text-sm text-muted-foreground">
-                    {questionnaire.data.peso}kg → {estimatedTime.targetWeight}kg
+                  <span className="text-sm font-bold text-brand-green">
+                    {estimatedTime.progressPercent}%
                   </span>
                 </div>
-                <div className="relative h-3 bg-white rounded-full overflow-hidden">
-                  {/* Progress starts at 5% to show user has started their journey */}
+                <div className="flex items-center justify-between mb-1 text-xs text-muted-foreground">
+                  <span>Inicio: {estimatedTime.initialWeight}kg</span>
+                  <span className="font-medium text-brand-orange">
+                    Actual: {estimatedTime.currentWeight}kg
+                  </span>
+                  <span>Meta: {estimatedTime.targetWeight}kg</span>
+                </div>
+                <div className="relative h-4 bg-white rounded-full overflow-hidden shadow-inner">
                   <motion.div
                     initial={{ width: 0 }}
-                    animate={{ width: '5%' }}
+                    animate={{ width: `${Math.max(5, estimatedTime.progressPercent)}%` }}
                     transition={{ duration: 1, ease: "easeOut" }}
+                    className="absolute inset-y-0 left-0 bg-gradient-to-r from-brand-green to-brand-lime rounded-full flex items-center justify-end pr-1"
+                  >
+                    {parseFloat(estimatedTime.progressPercent) > 10 && (
+                      <span className="text-[10px] text-white font-bold">
+                        {estimatedTime.progressPercent}%
+                      </span>
+                    )}
+                  </motion.div>
                     className="absolute inset-y-0 left-0 bg-gradient-to-r from-brand-green to-brand-lime rounded-full"
                   />
                 </div>
