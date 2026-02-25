@@ -1,11 +1,11 @@
 # PRD - NutriPlan - Planes Alimenticios Personalizados
 
 ## Problema Original
-Aplicación web para crear planes alimenticios personalizados con membresía/pago. Genera planes mediante cuestionario de 8 etapas con IA.
+Aplicación web para crear planes alimenticios personalizados con membresía/pago. Genera planes mediante cuestionario de 9 etapas con IA.
 
 ## Arquitectura
 - **Frontend:** React + Tailwind CSS + Shadcn/UI + Framer Motion + Recharts
-- **Backend:** FastAPI + MongoDB + emergentintegrations
+- **Backend:** FastAPI + MongoDB + emergentintegrations + fpdf2
 - **IA:** OpenAI GPT-5.2 (via Emergent LLM Key)
 - **Pagos:** Stripe (sk_test_emergent)
 - **Auth:** JWT email/contraseña
@@ -14,18 +14,19 @@ Aplicación web para crear planes alimenticios personalizados con membresía/pag
 
 ### Backend
 - Auth: register, login, me endpoints
-- Cuestionario: 9 etapas completas (incluyendo aviso legal)
+- Cuestionario: 9 etapas completas (incluyendo aviso legal + WhatsApp)
 - Plan Trial: 1 día gratuito con 4 comidas + lista super + guía ejercicios
 - Plan Completo: Generación con IA de 7+ días con todo incluido
 - Stripe: Checkout sessions con 4 planes
 - Seguimiento de Progreso: CRUD registros de peso + estadísticas
+- **Exportación PDF:** Endpoint `/api/meal-plans/{plan_id}/pdf` genera PDF completo
 
 ### Frontend
 - Landing page vibrante (verde/naranja InstaHealthy)
 - Auth (registro/login)
 - **Cuestionario de 9 etapas:**
   1. Aviso Legal (Términos y Condiciones)
-  2. Datos Generales
+  2. Datos Generales (+ campo WhatsApp)
   3. Objetivos
   4. Actividad y Rutina
   5. Salud
@@ -34,7 +35,7 @@ Aplicación web para crear planes alimenticios personalizados con membresía/pag
   8. Alimentación
   9. Consumo Fuera
 - Dashboard con macros y plan semanal
-- **Modal de Plan Completo con 3 tabs:**
+- **Modal de Plan Completo con 3 tabs + Botón Descargar PDF:**
   - Menú (días expandibles con ingredientes y preparación)
   - Lista del Super (por categorías)
   - Guía de Ejercicios (casa y gimnasio)
@@ -43,6 +44,10 @@ Aplicación web para crear planes alimenticios personalizados con membresía/pag
 - **Páginas Legales:**
   - Términos y Condiciones
   - Aviso de Privacidad
+- **Sistema de Recordatorios In-App:**
+  - Recordatorios configurables (agua, comidas, dormir)
+  - Panel de configuración con switches
+  - Notificaciones toast
 
 ### Planes de Precios
 | Plan | Precio | Duración |
@@ -86,13 +91,28 @@ Aplicación web para crear planes alimenticios personalizados con membresía/pag
 - [x] Guía de ejercicios
 - [x] Términos y condiciones
 - [x] Aviso de privacidad
+- [x] Campo WhatsApp en cuestionario
+- [x] Exportación PDF del plan
+- [x] Notificaciones/recordatorios In-App
 
 ### P1 (Siguiente)
-- [ ] Login con Facebook
-- [ ] Exportación PDF del plan
-- [ ] Notificaciones/recordatorios
+- [ ] Login con Facebook (requiere FACEBOOK_APP_ID y FACEBOOK_APP_SECRET)
+- [ ] Notificaciones por Email (requiere RESEND_API_KEY)
+- [ ] Notificaciones por WhatsApp (requiere credenciales Twilio)
 
 ### P2 (Futuro)
 - [ ] Integración con apps de fitness
-- [ ] Recetas con video
+- [ ] Recetas con video (IA video generation)
 - [ ] Panel de admin
+
+## Archivos Clave
+- `backend/server.py` - API principal (>1100 líneas, considerar refactorización)
+- `frontend/src/pages/Questionnaire.js` - Cuestionario 9 etapas
+- `frontend/src/pages/Dashboard.js` - Panel principal
+- `frontend/src/components/PlanDetailModal.js` - Modal con plan completo + PDF
+- `frontend/src/components/ReminderNotifications.js` - Sistema de recordatorios
+
+## Integraciones Pendientes (Requieren API Keys del Usuario)
+- **Resend:** Para notificaciones por email
+- **Twilio:** Para notificaciones por WhatsApp
+- **Facebook:** Para login social
