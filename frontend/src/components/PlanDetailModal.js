@@ -628,52 +628,67 @@ const PlanDetailModal = ({ plan, isOpen, onClose }) => {
                                   </div>
                                 )}
 
-                                {/* Exercises with Checkboxes */}
-                                <div className="space-y-2">
+                                {/* Exercises with Checkboxes and Illustrations */}
+                                <div className="space-y-3">
                                   {rutina.ejercicios?.map((ej, exIndex) => {
                                     const isCompleted = completedExercises[`${routineType}-${dayIndex}-${exIndex}`];
                                     
                                     return (
                                       <div 
                                         key={exIndex} 
-                                        className={`flex items-center justify-between py-3 px-3 rounded-xl cursor-pointer transition-all ${
+                                        className={`rounded-xl cursor-pointer transition-all overflow-hidden ${
                                           isCompleted 
-                                            ? 'bg-green-50 border border-green-200' 
-                                            : 'bg-gray-50 hover:bg-gray-100'
+                                            ? 'bg-green-50 border-2 border-green-300' 
+                                            : 'bg-gray-50 hover:bg-gray-100 border-2 border-transparent'
                                         }`}
                                         onClick={() => toggleExercise(routineType, dayIndex, exIndex)}
                                       >
-                                        <div className="flex items-center gap-3">
-                                          <Checkbox
-                                            checked={isCompleted}
-                                            className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
-                                          />
-                                          <div>
-                                            <div className="flex items-center gap-2">
-                                              <span className="text-lg">{getExerciseIcon(ej.nombre)}</span>
-                                              <span className={`font-medium ${isCompleted ? 'text-green-700' : 'text-foreground'}`}>
-                                                {ej.nombre}
-                                              </span>
-                                              {ej.musculo && (
-                                                <span className="text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded">
-                                                  {ej.musculo}
-                                                </span>
-                                              )}
-                                            </div>
-                                            {ej.descripcion && (
-                                              <p className="text-xs text-muted-foreground mt-0.5">{ej.descripcion}</p>
-                                            )}
+                                        <div className="flex items-stretch">
+                                          {/* Exercise Illustration */}
+                                          <div className={`w-20 h-20 flex-shrink-0 p-2 ${isCompleted ? 'bg-green-100' : 'bg-white'}`}>
+                                            {getExerciseIllustration(ej.nombre)}
                                           </div>
-                                        </div>
-                                        <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                                          <span className="flex items-center gap-1">
-                                            <Repeat className="w-3 h-3" />
-                                            {ej.series}x{ej.repeticiones}
-                                          </span>
-                                          <span className="flex items-center gap-1">
-                                            <Timer className="w-3 h-3" />
-                                            {ej.descanso}
-                                          </span>
+                                          
+                                          {/* Exercise Info */}
+                                          <div className="flex-1 p-3 flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                              <Checkbox
+                                                checked={isCompleted}
+                                                className="data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+                                              />
+                                              <div>
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                  <span className={`font-semibold ${isCompleted ? 'text-green-700' : 'text-foreground'}`}>
+                                                    {ej.nombre}
+                                                  </span>
+                                                  {ej.musculo && (
+                                                    <span className="text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded">
+                                                      {ej.musculo}
+                                                    </span>
+                                                  )}
+                                                </div>
+                                                {ej.descripcion && (
+                                                  <p className="text-xs text-muted-foreground mt-0.5">{ej.descripcion}</p>
+                                                )}
+                                                {ej.tecnica && (
+                                                  <p className="text-xs text-blue-600 mt-1 flex items-start gap-1">
+                                                    <Info className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                                                    {ej.tecnica}
+                                                  </p>
+                                                )}
+                                              </div>
+                                            </div>
+                                            <div className="flex flex-col items-end gap-1 text-sm text-muted-foreground ml-2">
+                                              <span className="flex items-center gap-1 font-medium text-purple-600">
+                                                <Repeat className="w-3 h-3" />
+                                                {ej.series}x{ej.repeticiones}
+                                              </span>
+                                              <span className="flex items-center gap-1 text-xs">
+                                                <Timer className="w-3 h-3" />
+                                                {ej.descanso}
+                                              </span>
+                                            </div>
+                                          </div>
                                         </div>
                                       </div>
                                     );
