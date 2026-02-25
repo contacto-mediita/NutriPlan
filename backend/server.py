@@ -471,6 +471,49 @@ Responde en JSON:
             "Este es solo un plan de prueba, suscríbete para obtener tu plan completo"
         ]
     
+    # Add exercise guide and shopping list for trial
+    plan_data["lista_super"] = {
+        "proteinas": ["pechuga de pollo 200g", "huevos 4 piezas"],
+        "lacteos": ["yogur griego 300g", "leche 500ml"],
+        "cereales": ["avena 100g"],
+        "verduras": ["brócoli 1 pieza", "lechuga 1 pieza", "tomate 2 piezas"],
+        "frutas": ["plátano 2 piezas", "frutos rojos 100g"],
+        "grasas_semillas": ["aceite de oliva", "nueces 50g"],
+        "basicos": ["sal, pimienta, especias"]
+    }
+    
+    plan_data["guia_ejercicios"] = {
+        "descripcion": f"Rutina de prueba para {objetivo.lower()}",
+        "dias_recomendados": 3,
+        "rutina_casa": [
+            {
+                "dia": "Día 1 - Cuerpo Completo",
+                "ejercicios": [
+                    {"nombre": "Sentadillas", "series": 3, "repeticiones": "15", "descanso": "45 seg"},
+                    {"nombre": "Lagartijas", "series": 3, "repeticiones": "10-12", "descanso": "45 seg"},
+                    {"nombre": "Plancha", "series": 3, "repeticiones": "30 seg", "descanso": "30 seg"},
+                    {"nombre": "Zancadas", "series": 3, "repeticiones": "10 c/pierna", "descanso": "45 seg"}
+                ],
+                "duracion": "20-25 min",
+                "tips": "Calienta 5 minutos antes de comenzar"
+            }
+        ],
+        "rutina_gimnasio": [
+            {
+                "dia": "Día 1 - Full Body",
+                "ejercicios": [
+                    {"nombre": "Sentadilla con barra", "series": 3, "repeticiones": "12", "descanso": "90 seg"},
+                    {"nombre": "Press de banca", "series": 3, "repeticiones": "10-12", "descanso": "90 seg"},
+                    {"nombre": "Jalón al pecho", "series": 3, "repeticiones": "12", "descanso": "60 seg"},
+                    {"nombre": "Press militar", "series": 3, "repeticiones": "10", "descanso": "60 seg"}
+                ],
+                "duracion": "35-40 min",
+                "tips": "Usa peso moderado para dominar la técnica"
+            }
+        ],
+        "cardio_recomendado": "20 minutos de caminata rápida después del entrenamiento"
+    }
+    
     # Save trial plan
     plan_id = str(uuid.uuid4())
     plan_doc = {
