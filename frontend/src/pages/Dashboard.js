@@ -29,6 +29,7 @@ const Dashboard = () => {
   const [showPlanModal, setShowPlanModal] = useState(false);
 
   const [currentWeight, setCurrentWeight] = useState(null);
+  const [customGoal, setCustomGoal] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -36,16 +37,18 @@ const Dashboard = () => {
 
   const fetchData = async () => {
     try {
-      const [plansRes, questionnaireRes, progressRes] = await Promise.all([
+      const [plansRes, questionnaireRes, progressRes, goalRes] = await Promise.all([
         axios.get(`${API}/meal-plans`),
         axios.get(`${API}/questionnaire`),
-        axios.get(`${API}/progress/stats`)
+        axios.get(`${API}/progress/stats`),
+        axios.get(`${API}/progress/goal`)
       ]);
       
       if (plansRes.data.length > 0) {
         setCurrentPlan(plansRes.data[0]);
       }
       setQuestionnaire(questionnaireRes.data);
+      setCustomGoal(goalRes.data);
       
       // Get current weight from progress stats
       if (progressRes.data.current_weight) {
