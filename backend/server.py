@@ -789,6 +789,107 @@ Responde en formato JSON:
                 "frutas": ["plátano 7 piezas", "frutos rojos 500g"],
                 "grasas_semillas": ["aceite de oliva 500ml", "nueces 200g", "aceitunas 1 frasco"],
                 "basicos": ["sal, pimienta, especias al gusto", "limones 4 piezas", "miel 1 frasco"]
+            },
+            "guia_ejercicios": {
+                "descripcion": f"Guía de ejercicios para {objetivo.lower()}",
+                "dias_recomendados": 4,
+                "rutina_casa": [
+                    {
+                        "dia": "Día 1 - Tren Superior",
+                        "ejercicios": [
+                            {"nombre": "Lagartijas", "series": 3, "repeticiones": "10-15", "descanso": "60 seg"},
+                            {"nombre": "Fondos en silla", "series": 3, "repeticiones": "12-15", "descanso": "60 seg"},
+                            {"nombre": "Plancha", "series": 3, "repeticiones": "30 seg", "descanso": "45 seg"},
+                            {"nombre": "Superman", "series": 3, "repeticiones": "12", "descanso": "45 seg"}
+                        ],
+                        "duracion": "25-30 min",
+                        "tips": "Mantén el core activado durante todos los ejercicios"
+                    },
+                    {
+                        "dia": "Día 2 - Tren Inferior",
+                        "ejercicios": [
+                            {"nombre": "Sentadillas", "series": 4, "repeticiones": "15-20", "descanso": "60 seg"},
+                            {"nombre": "Zancadas", "series": 3, "repeticiones": "12 c/pierna", "descanso": "60 seg"},
+                            {"nombre": "Puente de glúteos", "series": 3, "repeticiones": "15", "descanso": "45 seg"},
+                            {"nombre": "Elevación de talones", "series": 3, "repeticiones": "20", "descanso": "30 seg"}
+                        ],
+                        "duracion": "25-30 min",
+                        "tips": "Las rodillas no deben sobrepasar la punta de los pies"
+                    },
+                    {
+                        "dia": "Día 3 - Cardio",
+                        "ejercicios": [
+                            {"nombre": "Jumping jacks", "series": 3, "repeticiones": "30 seg", "descanso": "30 seg"},
+                            {"nombre": "Burpees", "series": 3, "repeticiones": "10", "descanso": "60 seg"},
+                            {"nombre": "Mountain climbers", "series": 3, "repeticiones": "30 seg", "descanso": "30 seg"},
+                            {"nombre": "Rodillas al pecho", "series": 3, "repeticiones": "30 seg", "descanso": "30 seg"}
+                        ],
+                        "duracion": "20-25 min",
+                        "tips": "Mantén un ritmo constante y respira correctamente"
+                    },
+                    {
+                        "dia": "Día 4 - Full Body",
+                        "ejercicios": [
+                            {"nombre": "Sentadilla + press", "series": 3, "repeticiones": "12", "descanso": "60 seg"},
+                            {"nombre": "Plancha lateral", "series": 3, "repeticiones": "20 seg c/lado", "descanso": "45 seg"},
+                            {"nombre": "Burpees suaves", "series": 3, "repeticiones": "8", "descanso": "60 seg"},
+                            {"nombre": "Bicicleta abdominal", "series": 3, "repeticiones": "20", "descanso": "45 seg"}
+                        ],
+                        "duracion": "30 min",
+                        "tips": "Este día es de recuperación activa, no te exijas de más"
+                    }
+                ],
+                "rutina_gimnasio": [
+                    {
+                        "dia": "Día 1 - Pecho y Tríceps",
+                        "ejercicios": [
+                            {"nombre": "Press de banca", "series": 4, "repeticiones": "10-12", "descanso": "90 seg"},
+                            {"nombre": "Aperturas con mancuernas", "series": 3, "repeticiones": "12", "descanso": "60 seg"},
+                            {"nombre": "Press inclinado", "series": 3, "repeticiones": "10-12", "descanso": "75 seg"},
+                            {"nombre": "Extensiones de tríceps", "series": 3, "repeticiones": "12-15", "descanso": "60 seg"},
+                            {"nombre": "Fondos en paralelas", "series": 3, "repeticiones": "al fallo", "descanso": "60 seg"}
+                        ],
+                        "duracion": "45-50 min",
+                        "tips": "Calienta bien antes de cargar peso"
+                    },
+                    {
+                        "dia": "Día 2 - Espalda y Bíceps",
+                        "ejercicios": [
+                            {"nombre": "Jalón al pecho", "series": 4, "repeticiones": "10-12", "descanso": "90 seg"},
+                            {"nombre": "Remo con barra", "series": 4, "repeticiones": "10-12", "descanso": "90 seg"},
+                            {"nombre": "Remo con mancuerna", "series": 3, "repeticiones": "12 c/lado", "descanso": "60 seg"},
+                            {"nombre": "Curl de bíceps", "series": 3, "repeticiones": "12", "descanso": "60 seg"},
+                            {"nombre": "Curl martillo", "series": 3, "repeticiones": "12", "descanso": "60 seg"}
+                        ],
+                        "duracion": "45-50 min",
+                        "tips": "Contrae bien la espalda en cada repetición"
+                    },
+                    {
+                        "dia": "Día 3 - Piernas",
+                        "ejercicios": [
+                            {"nombre": "Sentadilla con barra", "series": 4, "repeticiones": "10-12", "descanso": "120 seg"},
+                            {"nombre": "Prensa de piernas", "series": 4, "repeticiones": "12-15", "descanso": "90 seg"},
+                            {"nombre": "Extensiones de cuádriceps", "series": 3, "repeticiones": "15", "descanso": "60 seg"},
+                            {"nombre": "Curl femoral", "series": 3, "repeticiones": "12-15", "descanso": "60 seg"},
+                            {"nombre": "Elevación de talones", "series": 4, "repeticiones": "15-20", "descanso": "45 seg"}
+                        ],
+                        "duracion": "50-55 min",
+                        "tips": "Las piernas son el grupo más grande, dale intensidad"
+                    },
+                    {
+                        "dia": "Día 4 - Hombros y Abdomen",
+                        "ejercicios": [
+                            {"nombre": "Press militar", "series": 4, "repeticiones": "10-12", "descanso": "90 seg"},
+                            {"nombre": "Elevaciones laterales", "series": 3, "repeticiones": "15", "descanso": "60 seg"},
+                            {"nombre": "Elevaciones frontales", "series": 3, "repeticiones": "12", "descanso": "60 seg"},
+                            {"nombre": "Crunch en polea", "series": 3, "repeticiones": "15-20", "descanso": "45 seg"},
+                            {"nombre": "Plancha", "series": 3, "repeticiones": "45 seg", "descanso": "30 seg"}
+                        ],
+                        "duracion": "40-45 min",
+                        "tips": "Usa peso moderado en hombros para evitar lesiones"
+                    }
+                ],
+                "cardio_recomendado": "30 minutos de caminata rápida, trote o bicicleta 2-3 veces por semana, preferiblemente en días de descanso de pesas"
             }
         }
         recommendations = plan_data["recomendaciones"]
