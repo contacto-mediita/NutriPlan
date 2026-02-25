@@ -518,10 +518,8 @@ async def get_payment_status(session_id: str, current_user: dict = Depends(get_c
         
         # Update user subscription
         plan_type = transaction["plan_type"]
-        if plan_type == "weekly":
-            expires = datetime.now(timezone.utc) + timedelta(days=7)
-        else:
-            expires = datetime.now(timezone.utc) + timedelta(days=30)
+        duration_days = PLAN_DURATIONS.get(plan_type, 7)
+        expires = datetime.now(timezone.utc) + timedelta(days=duration_days)
         
         await db.users.update_one(
             {"id": current_user["id"]},
