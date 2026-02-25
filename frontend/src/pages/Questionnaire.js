@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight, User, Target, Activity, Heart, AlertCircle, Wine, Utensils, MapPin, Check } from 'lucide-react';
+import { ArrowLeft, ArrowRight, User, Target, Activity, Heart, AlertCircle, Wine, Utensils, MapPin, Check, ShieldCheck, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -16,6 +16,7 @@ import Navbar from '../components/Navbar';
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const ETAPAS = [
+  { id: 0, title: "Aviso Legal", icon: ShieldCheck, color: "bg-gray-700" },
   { id: 1, title: "Datos Generales", icon: User, color: "bg-blue-500" },
   { id: 2, title: "Objetivos", icon: Target, color: "bg-brand-orange" },
   { id: 3, title: "Actividad y Rutina", icon: Activity, color: "bg-brand-green" },
@@ -50,6 +51,7 @@ const Questionnaire = () => {
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   
   const [formData, setFormData] = useState({
     // Etapa 1
@@ -108,6 +110,12 @@ const Questionnaire = () => {
   };
 
   const handleNext = () => {
+    // Validar aceptación de términos en paso 0
+    if (currentStep === 0 && !termsAccepted) {
+      toast.error('Debes aceptar los términos para continuar');
+      return;
+    }
+    
     if (currentStep < ETAPAS.length - 1) {
       setCurrentStep(prev => prev + 1);
     }
@@ -117,6 +125,11 @@ const Questionnaire = () => {
     if (currentStep > 0) {
       setCurrentStep(prev => prev - 1);
     }
+  };
+
+  const handleDecline = () => {
+    toast.error('Debes aceptar los términos para usar el servicio');
+    navigate('/');
   };
 
   const handleSubmit = async () => {
@@ -129,7 +142,9 @@ const Questionnaire = () => {
         peso: parseFloat(formData.peso) || 0,
         dias_ejercicio: parseInt(formData.dias_ejercicio) || 0,
         ticket_promedio: parseFloat(formData.ticket_promedio) || 0,
-        alimentos_no_deseados: formData.alimentos_no_deseados.split(',').map(s => s.trim()).filter(Boolean)
+        alimentos_no_deseados: formData.alimentos_no_deseados.split(',').map(s => s.trim()).filter(Boolean),
+        terms_accepted: true,
+        terms_accepted_at: new Date().toISOString()
       };
       
       await axios.post(`${API}/questionnaire`, dataToSend);
@@ -162,7 +177,81 @@ const Questionnaire = () => {
           <p className="text-muted-foreground">Etapa {currentStep + 1} de {ETAPAS.length}</p>
         </div>
 
+        {/* Paso 0: Aviso Legal y Términos */}
         {currentStep === 0 && (
+          <div className="space-y-6">
+            <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-12 h-12 bg-gray-700 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <ShieldCheck className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-foreground">Antes de Comenzar</h3>
+                  <p className="text-muted-foreground text-sm">
+                    Confirma que has leído y aceptas nuestros Términos y Condiciones y Aviso de Privacidad.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-yellow-800">
+                    <strong>Aviso Importante:</strong> Este programa es solo una guía educativa y no sustituye atención médica. 
+                    Si tienes alguna enfermedad o tomas medicamentos, esta información debe ser evaluada por tu médico.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 mb-6">
+                <FileText className="w-4 h-4 text-muted-foreground" />
+                <a href="#" className="text-brand-green hover:underline text-sm font-medium">
+                  Términos y Condiciones
+                </a>
+                <span className="text-muted-foreground">•</span>
+                <a href="#" className="text-brand-green hover:underline text-sm font-medium">
+                  Aviso de Privacidad
+                </a>
+              </div>
+
+              <div className="border-t border-gray-200 pt-6">
+                <p className="font-semibold text-foreground mb-4">¿Aceptas continuar?</p>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <button
+                    onClick={() => setTermsAccepted(true)}
+                    className={`flex items-center justify-center gap-3 p-4 rounded-xl border-2 transition-all ${
+                      termsAccepted 
+                        ? 'border-brand-green bg-brand-green/5' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                    data-testid="accept-terms-btn"
+                  >
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                      termsAccepted ? 'bg-brand-green text-white' : 'bg-gray-100 text-gray-500'
+                    }`}>
+                      A
+                    </div>
+                    <span className="font-medium">Sí, acepto</span>
+                  </button>
+                  
+                  <button
+                    onClick={handleDecline}
+                    className="flex items-center justify-center gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-red-300 hover:bg-red-50 transition-all"
+                    data-testid="decline-terms-btn"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-500">
+                      B
+                    </div>
+                    <span className="font-medium">No acepto</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentStep === 1 && (
           <div className="space-y-4">
             <div>
               <Label>¿Cuál es tu nombre?</Label>
@@ -241,7 +330,7 @@ const Questionnaire = () => {
           </div>
         )}
 
-        {currentStep === 1 && (
+        {currentStep === 2 && (
           <div className="space-y-6">
             <div>
               <Label className="mb-3 block">¿Cuál es tu objetivo principal?</Label>
@@ -278,7 +367,7 @@ const Questionnaire = () => {
           </div>
         )}
 
-        {currentStep === 2 && (
+        {currentStep === 3 && (
           <div className="space-y-4">
             <Label className="mb-3 block">Sobre tu rutina diaria:</Label>
             <div className="space-y-3">
@@ -327,7 +416,7 @@ const Questionnaire = () => {
           </div>
         )}
 
-        {currentStep === 3 && (
+        {currentStep === 4 && (
           <div className="space-y-6">
             <div>
               <Label className="mb-3 block">¿Tienes algún padecimiento?</Label>
@@ -355,16 +444,16 @@ const Questionnaire = () => {
               />
               <span className="font-medium">¿Tomas medicamentos controlados?</span>
             </label>
-            {(formData.padecimientos.length > 0 || formData.medicamentos_controlados) && (
+            {(formData.padecimientos.length > 0 && !formData.padecimientos.includes('Ninguno')) || formData.medicamentos_controlados ? (
               <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-sm text-yellow-800">
                 <AlertCircle className="w-5 h-5 inline mr-2" />
                 Si presentas alguna condición o tomas medicamentos, recuerda que esta información debe ser evaluada por tu médico. Nuestro programa es solo una guía.
               </div>
-            )}
+            ) : null}
           </div>
         )}
 
-        {currentStep === 4 && (
+        {currentStep === 5 && (
           <div className="space-y-4">
             <Label className="mb-3 block">¿Presentas alguno de estos síntomas?</Label>
             <div className="grid grid-cols-2 gap-2 max-h-80 overflow-y-auto">
@@ -385,7 +474,7 @@ const Questionnaire = () => {
           </div>
         )}
 
-        {currentStep === 5 && (
+        {currentStep === 6 && (
           <div className="space-y-4">
             <label className={`flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all ${formData.fuma ? 'border-purple-400 bg-purple-50' : 'border-gray-200 hover:border-gray-300'}`}>
               <Checkbox
@@ -422,7 +511,7 @@ const Questionnaire = () => {
           </div>
         )}
 
-        {currentStep === 6 && (
+        {currentStep === 7 && (
           <div className="space-y-4">
             <div>
               <Label className="mb-3 block">¿Tienes alguna alergia alimentaria?</Label>
@@ -473,7 +562,7 @@ const Questionnaire = () => {
           </div>
         )}
 
-        {currentStep === 7 && (
+        {currentStep === 8 && (
           <div className="space-y-4">
             <div>
               <Label>¿Con qué frecuencia comes en restaurantes?</Label>
@@ -552,6 +641,7 @@ const Questionnaire = () => {
             {currentStep < ETAPAS.length - 1 ? (
               <Button
                 onClick={handleNext}
+                disabled={currentStep === 0 && !termsAccepted}
                 className="bg-brand-orange hover:bg-brand-orange/90 rounded-full px-6"
                 data-testid="btn-next"
               >
