@@ -296,7 +296,7 @@ const Landing = () => {
               <span className="text-xl font-heading font-bold text-white">NutriPlan</span>
             </div>
             <p className="text-white/60 text-sm">
-              © 2024 NutriPlan. Todos los derechos reservados.
+              © 2025 NutriPlan. Todos los derechos reservados.
             </p>
           </div>
         </div>
