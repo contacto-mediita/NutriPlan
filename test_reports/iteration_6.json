@@ -1,0 +1,141 @@
+{
+  "summary": "Tested new NutriPlan features: Progress bar with real weight data, healthy weight range calculation, questionnaire injuries section, and PlanDetailModal exercise SVG illustrations. Backend 100% (10 tests), Frontend 100% - all features working correctly.",
+
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+
+  "passed_tests": [
+    "BACKEND TESTS (10/10 passed):",
+    "- Questionnaire injuries section saves lesiones_restricciones array correctly",
+    "- Questionnaire injuries saves descripcion_lesion field",
+    "- Progress stats returns initial_weight from questionnaire",
+    "- Progress stats returns target_weight calculation for bajar de peso goal",
+    "- Adding weight record updates current_weight in progress stats",
+    "- Multiple weight records use latest for current_weight",
+    "- Healthy weight range calculation uses correct BMI formula",
+    "- Weight record CRUD: Create, Read, Delete working",
+    "",
+    "DASHBOARD PROGRESS FEATURES:",
+    "- Progress bar shows 'Progreso hacia tu objetivo' with percentage",
+    "- Shows 'Inicio: 85kg', 'Actual: 83kg', 'Meta: 67.4kg' labels",
+    "- Progress updates from 0% to 11% when weight record (83kg) is added",
+    "- Tiempo Estimado updates from 20 to 18 semanas after weight loss",
+    "",
+    "HEALTHY WEIGHT RANGE:",
+    "- 'Rango saludable: 56.7-76.3kg' displayed below BMI in Dashboard",
+    "- Calculation uses BMI range 18.5-24.9 based on age/height",
+    "",
+    "QUESTIONNAIRE INJURIES SECTION (Etapa 5 - Salud):",
+    "- Shows '¿Tienes alguna lesión o restricción para hacer ejercicio?'",
+    "- All injury options present: Ninguna, Lesión de rodilla, Lesión de espalda, Lesión de hombro, Lesión de tobillo, Hernia, Problema de cadera, Tendinitis, Otra",
+    "- Description field appears when injury selected",
+    "",
+    "PLANDETAILMODAL EXERCISE SVG ILLUSTRATIONS:",
+    "- Ejercicios tab shows exercise guide with SVG illustrations",
+    "- Each exercise has unique SVG: Sentadillas (squat pose), Lagartijas (push-up), Plancha (plank), Zancadas (lunge)",
+    "- 58 SVG elements found on page (illustrations + icons)",
+    "- Exercise cards show series x reps (e.g., 3x15), rest time (45 seg), and checkboxes",
+    "- 'En Casa' and 'Gimnasio' tabs working",
+    "- Cardio recommendation displayed",
+    "",
+    "PLANDETAILMODAL MENU/RECIPES:",
+    "- Menu tab shows meals: Desayuno, Snack, Comida, Cena",
+    "- Macros summary: Calorías/día (2168), Proteínas (135.5g), Carbohidratos (271g), Grasas (60.2g)",
+    "- Note: Sustituciones in recipes requires new plan generation with updated AI prompt (trial plans use old format)"
+  ],
+
+  "test_report_links": [
+    "/app/backend/tests/test_progress_features.py",
+    "/app/test_reports/pytest/pytest_progress_features.xml"
+  ],
+
+  "action_items": [
+    "Note: Recipe substitutions (Sustituciones) section only appears in plans generated after the AI prompt update. Trial plans use the old format without 3-option meals and substitutions. To fully test substitutions, generate a new plan with a subscribed user."
+  ],
+
+  "critical_code_review_comments": [
+    "calculateHealthyWeightRange() in Dashboard.js correctly calculates BMI range 18.5-24.9 adjusted for age",
+    "calculateEstimatedTime() properly uses currentWeight (from progress stats) or falls back to questionnaire peso",
+    "progressPercent calculation: (alreadyLost / totalToLose) * 100 - correctly handles bajar/aumentar/mantener goals",
+    "getExerciseIllustration() in ExerciseIllustrations.js maps exercise names to SVG illustrations with good keyword matching",
+    "QuestionnaireData model in server.py includes lesiones_restricciones and descripcion_lesion fields",
+    "Progress stats endpoint returns current_weight from latest weight record when available"
+  ],
+
+  "updated_files": [
+    "/app/backend/tests/test_progress_features.py"
+  ],
+
+  "success_rate": {
+    "backend": "100% - All 10 progress feature tests passed",
+    "frontend": "100% - All Dashboard progress, healthy range, questionnaire injuries, and exercise illustrations working"
+  },
+
+  "test_credentials": {
+    "user_1": {
+      "email": "dashboard_full_test_001@test.com",
+      "password": "testpass123",
+      "details": "User with questionnaire (peso=85kg, estatura=175cm, objetivo='Bajar de peso'). Has weight record 83kg added during testing."
+    },
+    "user_2": {
+      "email": "plan_test_20260225153630@test.com",
+      "password": "testpass123",
+      "details": "User with trial plan (peso=80kg, objetivo='bajar de peso'). Has guia_ejercicios with rutina_casa and rutina_gimnasio."
+    }
+  },
+
+  "seed_data_creation": "Added weight record (83kg) to dashboard_full_test_001 user to test progress update from 0% to 11%",
+
+  "retest_needed": false,
+
+  "should_main_agent_self_test": false,
+
+  "context_for_next_testing_agent": "All requested features verified working: 1) Progress bar updates with real weight data (0%→11% after adding 83kg record), 2) Healthy weight range displayed (56.7-76.3kg), 3) Questionnaire injuries section present with all 9 options, 4) Exercise SVG illustrations in PlanDetailModal working for Sentadillas/Lagartijas/Plancha/Zancadas. Recipe substitutions only appear in plans generated with updated AI prompt - trial plans use old format.",
+
+  "features_verified": {
+    "dashboard_progress_bar": {
+      "location": "Dashboard Goal & BMI Section - below the 3-column grid",
+      "shows": ["Progreso hacia tu objetivo %", "Inicio weight", "Actual weight (from progress/stats)", "Meta weight"],
+      "calculation": "progressPercent = (alreadyLost / totalToLose) * 100",
+      "update_trigger": "Fetches progress/stats endpoint on dashboard load to get current_weight"
+    },
+    "healthy_weight_range": {
+      "location": "Dashboard IMC section - green text below weight/height",
+      "shows": "Rango saludable: {min}-{max}kg",
+      "calculation": "BMI 18.5-24.9 * (estatura_m)² adjusted for age >50 or >65"
+    },
+    "questionnaire_injuries": {
+      "location": "Cuestionario Etapa 5 (Salud) - below medicamentos controlados",
+      "label": "¿Tienes alguna lesión o restricción para hacer ejercicio?",
+      "options": ["Ninguna", "Lesión de rodilla", "Lesión de espalda", "Lesión de hombro", "Lesión de tobillo", "Hernia", "Problema de cadera", "Tendinitis", "Otra"],
+      "description_field": "Shows when any injury except 'Ninguna' selected"
+    },
+    "exercise_svg_illustrations": {
+      "location": "PlanDetailModal → Ejercicios tab → En Casa/Gimnasio",
+      "component": "ExerciseIllustrations.js - getExerciseIllustration()",
+      "mappings": {
+        "sentadillas": "Squat pose SVG (green stick figure)",
+        "lagartijas": "Push-up pose SVG",
+        "plancha": "Plank pose SVG",
+        "zancadas": "Lunge pose SVG",
+        "fondos": "Dip pose SVG",
+        "curl": "Bicep curl SVG",
+        "remo": "Row exercise SVG",
+        "cardio": "Running with heart SVG",
+        "default": "Standing figure SVG"
+      }
+    },
+    "recipe_substitutions": {
+      "status": "Code implemented in PlanDetailModal but requires new plan generation to see",
+      "note": "Trial plans generated before AI prompt update use old format without opciones/sustituciones"
+    }
+  }
+}
