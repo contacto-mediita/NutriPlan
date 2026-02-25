@@ -1529,7 +1529,7 @@ async def get_admin_users(
     
     users = await db.users.find(
         query,
-        {"_id": 0, "password_hash": 0}
+        {"_id": 0, "password_hash": 0, "password": 0}
     ).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
     
     total = await db.users.count_documents(query)
