@@ -724,10 +724,8 @@ async def stripe_webhook(request: Request):
             plan_type = metadata.get("plan_type")
             
             if user_id and plan_type:
-                if plan_type == "weekly":
-                    expires = datetime.now(timezone.utc) + timedelta(days=7)
-                else:
-                    expires = datetime.now(timezone.utc) + timedelta(days=30)
+                duration_days = PLAN_DURATIONS.get(plan_type, 7)
+                expires = datetime.now(timezone.utc) + timedelta(days=duration_days)
                 
                 await db.users.update_one(
                     {"id": user_id},
