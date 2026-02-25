@@ -130,11 +130,16 @@ const Progress = () => {
   };
 
   const getProgressPercentage = () => {
-    if (!stats?.initial_weight || !stats?.target_weight || !stats?.current_weight) return 0;
-    const totalChange = Math.abs(stats.target_weight - stats.initial_weight);
+    const targetWeight = customGoal?.target_weight || stats?.target_weight;
+    if (!stats?.initial_weight || !targetWeight || !stats?.current_weight) return 0;
+    const totalChange = Math.abs(targetWeight - stats.initial_weight);
     const currentChange = Math.abs(stats.current_weight - stats.initial_weight);
     if (totalChange === 0) return 100;
     return Math.min(100, Math.round((currentChange / totalChange) * 100));
+  };
+
+  const getEffectiveTarget = () => {
+    return customGoal?.target_weight || stats?.target_weight;
   };
 
   const chartData = records.map(r => ({
