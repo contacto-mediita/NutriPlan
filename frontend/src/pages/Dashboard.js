@@ -150,71 +150,81 @@ const Dashboard = () => {
     return { min: minWeight, max: maxWeight };
   };
 
-  // Calculate estimated time to reach goal using real current weight
+  // Calculate estimated time to reach goal using real current weight and custom goal
   const calculateEstimatedTime = () => {
     if (!questionnaire?.data) return null;
     
     const pesoInicial = questionnaire.data.peso;
-    const pesoActual = currentWeight || pesoInicial; // Use current weight if available
+    const pesoActual = currentWeight || pesoInicial;
     const estatura = questionnaire.data.estatura / 100;
-    const objetivo = questionnaire.data.objetivo_principal?.toLowerCase() || '';
     const diasEjercicio = questionnaire.data.dias_ejercicio || 0;
     
     if (!pesoInicial || !estatura) return null;
     
+    // Use custom goal if available, otherwise calculate from questionnaire
+    const hasCustomGoal = customGoal?.is_custom && customGoal?.target_weight;
+    const objetivo = hasCustomGoal ? customGoal.goal_type : (questionnaire.data.objetivo_principal?.toLowerCase() || '');
+    
     // Calculate healthy weight range
     const healthyRange = calculateHealthyWeightRange();
     
-    // Calculate ideal weight based on BMI 22 (middle of healthy range)
-    const pesoIdeal = 22 * (estatura * estatura);
+    // Use custom target weight or calculate based on BMI
+    let targetWeight;
+    if (hasCustomGoal) {
+      targetWeight = customGoal.target_weight;
+    } else {
+      // Calculate ideal weight based on BMI 22 (middle of healthy range)
+      targetWeight = 22 * (estatura * estatura);
+    }
     
     // Estimate weekly change based on objective and exercise
     let weeklyChange = 0;
+    let direction = 'mantener';
     
-    if (objetivo.includes('bajar')) {
-      // Weight loss: 0.5-1kg per week depending on exercise
+    if (objetivo.includes('bajar') || (pesoActual > targetWeight)) {
+      direction = 'bajar';
       weeklyChange = 0.5 + (diasEjercicio * 0.1);
-      const diferencia = Math.max(0, pesoActual - pesoIdeal);
-      const weeksNeeded = diferencia / weeklyChange;
+      const diferencia = Math.max(0, pesoActual - targetWeight);
+      const weeksNeeded = weeklyChange > 0 ? diferencia / weeklyChange : 0;
       
-      // Calculate progress percentage
-      const totalToLose = pesoInicial - pesoIdeal;
+      const totalToLose = pesoInicial - targetWeight;
       const alreadyLost = pesoInicial - pesoActual;
       const progressPercent = totalToLose > 0 ? Math.min(100, Math.max(0, (alreadyLost / totalToLose) * 100)) : 0;
       
       return {
         weeks: Math.ceil(weeksNeeded),
-        targetWeight: pesoIdeal.toFixed(1),
+        targetWeight: targetWeight.toFixed(1),
         weeklyChange: weeklyChange.toFixed(2),
-        direction: 'bajar',
+        direction,
         currentWeight: pesoActual,
         initialWeight: pesoInicial,
         progressPercent: progressPercent.toFixed(0),
-        healthyRange
+        healthyRange,
+        isCustomGoal: hasCustomGoal
       };
-    } else if (objetivo.includes('aumentar') || objetivo.includes('masa')) {
-      // Muscle gain: 0.25-0.5kg per week
+    } else if (objetivo.includes('aumentar') || objetivo.includes('masa') || (pesoActual < targetWeight)) {
+      direction = 'aumentar';
       weeklyChange = 0.25 + (diasEjercicio * 0.05);
-      const targetWeight = pesoInicial + (pesoInicial * 0.1);
-      const diferencia = Math.max(0, targetWeight - pesoActual);
-      const weeksNeeded = diferencia / weeklyChange;
+      const finalTarget = hasCustomGoal ? targetWeight : pesoInicial + (pesoInicial * 0.1);
+      const diferencia = Math.max(0, finalTarget - pesoActual);
+      const weeksNeeded = weeklyChange > 0 ? diferencia / weeklyChange : 0;
       
-      // Calculate progress percentage
-      const totalToGain = targetWeight - pesoInicial;
+      const totalToGain = finalTarget - pesoInicial;
       const alreadyGained = pesoActual - pesoInicial;
       const progressPercent = totalToGain > 0 ? Math.min(100, Math.max(0, (alreadyGained / totalToGain) * 100)) : 0;
       
       return {
         weeks: Math.ceil(weeksNeeded),
-        targetWeight: targetWeight.toFixed(1),
+        targetWeight: finalTarget.toFixed(1),
         weeklyChange: weeklyChange.toFixed(2),
-        direction: 'aumentar',
+        direction,
         currentWeight: pesoActual,
         initialWeight: pesoInicial,
         progressPercent: progressPercent.toFixed(0),
-        healthyRange
+        healthyRange,
+        isCustomGoal: hasCustomGoal
       };
-    } else if (objetivo.includes('mantener')) {
+    } else {
       return {
         weeks: 0,
         targetWeight: pesoInicial.toFixed(1),
@@ -223,11 +233,10 @@ const Dashboard = () => {
         currentWeight: pesoActual,
         initialWeight: pesoInicial,
         progressPercent: 100,
-        healthyRange
+        healthyRange,
+        isCustomGoal: hasCustomGoal
       };
     }
-    
-    return null;
   };
 
   const healthyWeightRange = calculateHealthyWeightRange();
