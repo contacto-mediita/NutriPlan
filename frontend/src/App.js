@@ -47,6 +47,8 @@ function AppRoutes() {
       <Route path="/" element={<Landing />} />
       <Route path="/auth" element={user ? <Navigate to="/dashboard" replace /> : <Auth />} />
       <Route path="/precios" element={<Pricing />} />
+      <Route path="/terminos" element={<Terms />} />
+      <Route path="/privacidad" element={<Privacy />} />
       <Route path="/cuestionario" element={<ProtectedRoute><Questionnaire /></ProtectedRoute>} />
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/payment-success" element={<ProtectedRoute><PaymentSuccess /></ProtectedRoute>} />
