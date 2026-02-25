@@ -62,6 +62,7 @@ const Questionnaire = () => {
     sexo: '',
     estatura: '',
     peso: '',
+    foto_usuario: null,
     // Etapa 2
     objetivo_principal: '',
     objetivos_secundarios: [],
@@ -75,6 +76,8 @@ const Questionnaire = () => {
     // Etapa 4
     padecimientos: [],
     medicamentos_controlados: false,
+    lesiones_restricciones: [],
+    descripcion_lesion: '',
     // Etapa 5
     sintomas: [],
     // Etapa 6
