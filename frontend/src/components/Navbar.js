@@ -107,6 +107,15 @@ const Navbar = () => {
                     <User className="w-4 h-4 mr-2" />
                     Historial
                   </DropdownMenuItem>
+                  {isAdmin && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => navigate('/admin')} data-testid="menu-admin">
+                        <Shield className="w-4 h-4 mr-2" />
+                        Panel Admin
+                      </DropdownMenuItem>
+                    </>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="text-red-600" data-testid="menu-logout">
                     <LogOut className="w-4 h-4 mr-2" />
