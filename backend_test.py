@@ -288,6 +288,107 @@ class MealPlanAPITester:
                 self.log_test("Checkout Response Structure", False, "Missing url or session_id")
         return False
 
+    def test_add_weight_record(self):
+        """Test adding weight record"""
+        if not self.token:
+            print("   Skipping weight record test - no token")
+            return False
+
+        weight_data = {
+            "weight": 75.5,
+            "date": "2024-01-15",
+            "notes": "Test weight entry"
+        }
+        
+        success, response = self.run_test(
+            "Add Weight Record",
+            "POST",
+            "/progress/weight",
+            200,
+            data=weight_data
+        )
+        
+        if success:
+            # Store the record ID for later deletion
+            self.weight_record_id = response.get('id')
+            # Validate response structure
+            required_fields = ['id', 'user_id', 'weight', 'date']
+            missing_fields = [field for field in required_fields if field not in response]
+            
+            if missing_fields:
+                self.log_test("Weight Record Structure", False, f"Missing fields: {missing_fields}")
+                return False
+            else:
+                self.log_test("Weight Record Structure", True)
+                return True
+        return False
+
+    def test_get_weight_records(self):
+        """Test getting all weight records"""
+        if not self.token:
+            print("   Skipping get weight records test - no token")
+            return False
+            
+        success, response = self.run_test(
+            "Get Weight Records",
+            "GET",
+            "/progress/weight",
+            200
+        )
+        
+        if success:
+            # Should be a list
+            if isinstance(response, list):
+                self.log_test("Weight Records List Format", True)
+                return True
+            else:
+                self.log_test("Weight Records List Format", False, f"Expected list, got {type(response)}")
+        return False
+
+    def test_get_progress_stats(self):
+        """Test getting progress statistics"""
+        if not self.token:
+            print("   Skipping progress stats test - no token")
+            return False
+            
+        success, response = self.run_test(
+            "Get Progress Stats",
+            "GET",
+            "/progress/stats",
+            200
+        )
+        
+        if success:
+            # Validate response structure
+            expected_fields = ['initial_weight', 'current_weight', 'target_weight', 'weight_change', 'total_records', 'goal']
+            missing_fields = [field for field in expected_fields if field not in response]
+            
+            if missing_fields:
+                self.log_test("Progress Stats Structure", False, f"Missing fields: {missing_fields}")
+                return False
+            else:
+                self.log_test("Progress Stats Structure", True)
+                return True
+        return False
+
+    def test_delete_weight_record(self):
+        """Test deleting weight record"""
+        if not self.token:
+            print("   Skipping delete weight record test - no token")
+            return False
+            
+        if not hasattr(self, 'weight_record_id') or not self.weight_record_id:
+            print("   Skipping delete test - no weight record ID")
+            return False
+
+        success, response = self.run_test(
+            "Delete Weight Record",
+            "DELETE",
+            f"/progress/weight/{self.weight_record_id}",
+            200
+        )
+        return success
+
 def main():
     print("🧪 Starting Meal Plan API Tests")
     print("=" * 50)
