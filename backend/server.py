@@ -690,27 +690,79 @@ Responde en formato JSON:
         
     except Exception as e:
         logger.error(f"Error generating meal plan: {e}")
-        # Fallback plan if AI fails
+        # Fallback plan if AI fails - new format with 4 meals
         plan_data = {
             "dias": [
                 {
-                    "dia": day,
+                    "dia": f"Día {i+1}",
                     "comidas": [
-                        {"tipo": "Desayuno", "nombre": "Avena con frutas", "ingredientes": ["avena", "plátano", "fresas"], "calorias": int(calories_target * 0.25)},
-                        {"tipo": "Snack AM", "nombre": "Yogur natural", "ingredientes": ["yogur griego", "miel"], "calorias": int(calories_target * 0.10)},
-                        {"tipo": "Comida", "nombre": "Pollo con verduras", "ingredientes": ["pechuga de pollo", "brócoli", "arroz integral"], "calorias": int(calories_target * 0.35)},
-                        {"tipo": "Snack PM", "nombre": "Frutos secos", "ingredientes": ["almendras", "nueces"], "calorias": int(calories_target * 0.10)},
-                        {"tipo": "Cena", "nombre": "Ensalada con proteína", "ingredientes": ["lechuga", "tomate", "atún"], "calorias": int(calories_target * 0.20)}
+                        {
+                            "tipo": "Desayuno",
+                            "nombre": "Avena proteica con frutas",
+                            "ingredientes": [
+                                {"item": "avena", "cantidad": "1/2 taza"},
+                                {"item": "plátano", "cantidad": "1 pieza"},
+                                {"item": "leche", "cantidad": "1 taza"},
+                                {"item": "miel", "cantidad": "1 cdita"}
+                            ],
+                            "preparacion": ["Calienta la leche", "Agrega la avena y cocina 5 min", "Sirve con plátano y miel"],
+                            "tip": "Puedes preparar la noche anterior como overnight oats"
+                        },
+                        {
+                            "tipo": "Comida",
+                            "nombre": "Pollo a la plancha con verduras",
+                            "ingredientes": [
+                                {"item": "pechuga de pollo", "cantidad": "150g"},
+                                {"item": "brócoli", "cantidad": "1 taza"},
+                                {"item": "arroz integral", "cantidad": "1/2 taza"},
+                                {"item": "aceite de oliva", "cantidad": "1 cdita"}
+                            ],
+                            "preparacion": ["Sazona el pollo y cocina a la plancha", "Cuece el arroz", "Saltea el brócoli con aceite"],
+                            "tip": "Puedes sustituir el pollo por pescado o tofu"
+                        },
+                        {
+                            "tipo": "Snack",
+                            "nombre": "Yogur griego con nueces",
+                            "ingredientes": [
+                                {"item": "yogur griego natural", "cantidad": "150g"},
+                                {"item": "nueces", "cantidad": "10 piezas"},
+                                {"item": "frutos rojos", "cantidad": "1/4 taza"}
+                            ],
+                            "preparacion": ["Sirve el yogur en un bowl", "Agrega las nueces y frutos rojos"],
+                            "tip": "El yogur griego tiene más proteína que el regular"
+                        },
+                        {
+                            "tipo": "Cena",
+                            "nombre": "Ensalada mediterránea con atún",
+                            "ingredientes": [
+                                {"item": "atún en agua", "cantidad": "1 lata"},
+                                {"item": "lechuga mixta", "cantidad": "2 tazas"},
+                                {"item": "tomate", "cantidad": "1 pieza"},
+                                {"item": "aceitunas", "cantidad": "5 piezas"},
+                                {"item": "aceite de oliva", "cantidad": "1 cda"}
+                            ],
+                            "preparacion": ["Lava y corta las verduras", "Escurre el atún", "Mezcla todo y adereza con aceite y limón"],
+                            "tip": "Cena ligera ideal para no irte a dormir pesado"
+                        }
                     ]
-                } for day in ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+                } for i in range(7)
             ],
             "recomendaciones": [
                 "Bebe al menos 2 litros de agua al día",
-                "Evita alimentos procesados",
-                "Come despacio y mastica bien",
-                "No te saltes comidas",
-                "Descansa al menos 7 horas"
-            ]
+                "Evita alimentos procesados y ultraprocesados",
+                "Come despacio y mastica bien cada bocado",
+                "No te saltes comidas, mantén horarios regulares",
+                "Descansa al menos 7-8 horas cada noche"
+            ],
+            "lista_super": {
+                "proteinas": ["pechuga de pollo 1 kg", "atún en agua 7 latas", "huevos 12 piezas"],
+                "lacteos": ["leche 2 L", "yogur griego 1 kg"],
+                "cereales": ["avena 500g", "arroz integral 1 kg"],
+                "verduras": ["brócoli 2 piezas", "lechuga 2 piezas", "tomate 7 piezas"],
+                "frutas": ["plátano 7 piezas", "frutos rojos 500g"],
+                "grasas_semillas": ["aceite de oliva 500ml", "nueces 200g", "aceitunas 1 frasco"],
+                "basicos": ["sal, pimienta, especias al gusto", "limones 4 piezas", "miel 1 frasco"]
+            }
         }
         recommendations = plan_data["recomendaciones"]
     
