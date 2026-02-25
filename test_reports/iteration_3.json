@@ -1,0 +1,85 @@
+{
+  "summary": "Tested new WhatsApp field and PDF export features. All 4 features requested are working correctly - WhatsApp field visible in questionnaire Stage 1, WhatsApp saved to backend, PDF endpoint generates valid PDF, Download PDF button visible in PlanDetailModal.",
+  
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  
+  "passed_tests": [
+    "WhatsApp field visible in Questionnaire Stage 1 (Datos Generales)",
+    "WhatsApp field has correct label 'WhatsApp (para recordatorios)'",
+    "WhatsApp field has data-testid='q-whatsapp'",
+    "WhatsApp field shows helper text 'Opcional - Te enviaremos recordatorios de comidas'",
+    "WhatsApp field accepts and stores phone number",
+    "POST /api/questionnaire accepts telefono_whatsapp field",
+    "GET /api/questionnaire returns telefono_whatsapp field persisted",
+    "telefono_whatsapp is optional (can be omitted or empty string)",
+    "GET /api/meal-plans/{plan_id}/pdf returns 200 with valid PDF",
+    "PDF endpoint returns correct Content-Type: application/pdf",
+    "PDF endpoint returns correct Content-Disposition with filename",
+    "PDF export unauthorized returns 401/403 without token",
+    "PDF export returns 404 for non-existent plan",
+    "Download PDF button visible in PlanDetailModal",
+    "Download button has data-testid='download-pdf-btn'",
+    "Download button text shows 'Descargar PDF'",
+    "Backend API all endpoints working (100% success)"
+  ],
+  
+  "test_report_links": [
+    "/app/backend/tests/test_whatsapp_pdf_features.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  
+  "action_items": [],
+  
+  "critical_code_review_comments": [
+    "PDF export uses fpdf2 library correctly with proper Spanish encoding",
+    "WhatsApp field properly defined as Optional[str] in QuestionnaireData model",
+    "PDF button properly integrated in PlanDetailModal header with download icon"
+  ],
+  
+  "updated_files": [
+    "/app/backend/tests/test_whatsapp_pdf_features.py"
+  ],
+  
+  "success_rate": {
+    "backend": "100% - All 8 tests passed for WhatsApp and PDF features",
+    "frontend": "100% - WhatsApp field and PDF button verified visible and functional"
+  },
+  
+  "seed_data_creation": "Created test users via API: pdf_test_*, ui_whatsapp_check_*, ui_pdf_*, pdf_ui_test_* for testing",
+  
+  "retest_needed": false,
+  
+  "should_main_agent_self_test": false,
+  
+  "context_for_next_testing_agent": "WhatsApp and PDF features are fully working. The QuestionnaireData model includes telefono_whatsapp as Optional[str]. PDF endpoint at GET /api/meal-plans/{plan_id}/pdf generates valid PDF with meal plan, shopping list, and exercise guide. PlanDetailModal has 'Descargar PDF' button with data-testid='download-pdf-btn'.",
+  
+  "features_verified": {
+    "whatsapp_field": {
+      "location": "Questionnaire Stage 1 (Datos Generales)",
+      "data_testid": "q-whatsapp",
+      "label": "WhatsApp (para recordatorios)",
+      "placeholder": "Ej: 55 1234 5678",
+      "helper_text": "Opcional - Te enviaremos recordatorios de comidas",
+      "backend_field": "telefono_whatsapp",
+      "optional": true
+    },
+    "pdf_export": {
+      "endpoint": "GET /api/meal-plans/{plan_id}/pdf",
+      "button_location": "PlanDetailModal header",
+      "button_testid": "download-pdf-btn",
+      "button_text": "Descargar PDF",
+      "file_format": "PDF with %PDF- header",
+      "content_type": "application/pdf",
+      "filename_pattern": "plan-alimenticio-{plan_id}.pdf"
+    }
+  }
+}
