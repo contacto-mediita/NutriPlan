@@ -233,6 +233,98 @@ async def get_questionnaire(current_user: dict = Depends(get_current_user)):
         return None
     return doc
 
+# ============== PROGRESS TRACKING ==============
+
+@api_router.post("/progress/weight")
+async def add_weight_record(data: WeightRecordCreate, current_user: dict = Depends(get_current_user)):
+    """Add a new weight record"""
+    record_id = str(uuid.uuid4())
+    record_date = data.date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    
+    record_doc = {
+        "id": record_id,
+        "user_id": current_user["id"],
+        "weight": data.weight,
+        "date": record_date,
+        "notes": data.notes,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.weight_records.insert_one(record_doc)
+    
+    return WeightRecord(**record_doc)
+
+@api_router.get("/progress/weight")
+async def get_weight_records(current_user: dict = Depends(get_current_user)):
+    """Get all weight records for the user, sorted by date"""
+    records = await db.weight_records.find(
+        {"user_id": current_user["id"]},
+        {"_id": 0}
+    ).sort("date", 1).to_list(1000)
+    return records
+
+@api_router.delete("/progress/weight/{record_id}")
+async def delete_weight_record(record_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a weight record"""
+    result = await db.weight_records.delete_one({
+        "id": record_id,
+        "user_id": current_user["id"]
+    })
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Registro no encontrado")
+    return {"message": "Registro eliminado"}
+
+@api_router.get("/progress/stats")
+async def get_progress_stats(current_user: dict = Depends(get_current_user)):
+    """Get progress statistics"""
+    # Get weight records
+    records = await db.weight_records.find(
+        {"user_id": current_user["id"]},
+        {"_id": 0}
+    ).sort("date", 1).to_list(1000)
+    
+    # Get questionnaire for initial weight and goal
+    questionnaire = await db.questionnaire_responses.find_one(
+        {"user_id": current_user["id"]},
+        {"_id": 0},
+        sort=[("created_at", -1)]
+    )
+    
+    initial_weight = None
+    target_weight = None
+    goal = None
+    
+    if questionnaire:
+        q_data = questionnaire.get("data", {})
+        initial_weight = q_data.get("peso")
+        goal = q_data.get("objetivo_principal")
+        
+        # Calculate target based on goal
+        if initial_weight:
+            if goal and "bajar" in goal.lower():
+                target_weight = initial_weight * 0.9  # 10% less
+            elif goal and ("aumentar" in goal.lower() or "masa" in goal.lower()):
+                target_weight = initial_weight * 1.05  # 5% more
+            else:
+                target_weight = initial_weight  # Maintain
+    
+    current_weight = None
+    weight_change = None
+    
+    if records:
+        current_weight = records[-1]["weight"]
+        first_weight = records[0]["weight"] if records else initial_weight
+        if first_weight:
+            weight_change = round(current_weight - first_weight, 2)
+    
+    return ProgressStats(
+        initial_weight=initial_weight,
+        current_weight=current_weight,
+        target_weight=round(target_weight, 1) if target_weight else None,
+        weight_change=weight_change,
+        total_records=len(records),
+        goal=goal
+    )
+
 # ============== MEAL PLAN GENERATION ==============
 
 @api_router.post("/meal-plans/trial")
