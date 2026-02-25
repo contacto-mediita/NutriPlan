@@ -9,6 +9,8 @@ import Pricing from "./pages/Pricing";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import History from "./pages/History";
 import Progress from "./pages/Progress";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
 import "./App.css";
 
 const ProtectedRoute = ({ children }) => {
