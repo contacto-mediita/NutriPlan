@@ -253,12 +253,26 @@ const Dashboard = () => {
                 <h2 className="text-xl font-heading font-bold text-foreground">
                   Plan de la Semana
                 </h2>
-                {hasActiveSubscription() && (
-                  <span className="text-sm text-muted-foreground flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
-                    {daysUntilExpiry()} días restantes
-                  </span>
-                )}
+                <div className="flex items-center gap-2">
+                  {currentPlan && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowPlanModal(true)}
+                      className="rounded-full text-xs"
+                      data-testid="view-full-plan-btn"
+                    >
+                      <Eye className="w-3 h-3 mr-1" />
+                      Ver completo
+                    </Button>
+                  )}
+                  {hasActiveSubscription() && (
+                    <span className="text-sm text-muted-foreground flex items-center gap-1">
+                      <Clock className="w-4 h-4" />
+                      {daysUntilExpiry()} días
+                    </span>
+                  )}
+                </div>
               </div>
 
               {currentPlan ? (
