@@ -374,11 +374,25 @@ const PlanDetailModal = ({ plan, isOpen, onClose }) => {
                                     </div>
                                   )}
 
+                                  {/* Sustituciones */}
+                                  {currentOption.sustituciones && currentOption.sustituciones.length > 0 && (
+                                    <div className="bg-purple-50 p-3 rounded-xl">
+                                      <h6 className="text-sm font-bold text-purple-700 mb-2">🔄 Sustituciones:</h6>
+                                      <ul className="space-y-1">
+                                        {currentOption.sustituciones.map((sub, i) => (
+                                          <li key={i} className="text-xs text-purple-600">
+                                            • {sub}
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
+
                                   {/* Tip */}
                                   {currentOption.tip && (
                                     <div className="bg-brand-green/5 p-3 rounded-xl">
                                       <p className="text-sm text-brand-green">
-                                        💡 <strong>Tip:</strong> {currentOption.tip}
+                                        💡 <strong>Tip NutriPlan:</strong> {currentOption.tip}
                                       </p>
                                     </div>
                                   )}
