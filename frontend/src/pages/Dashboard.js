@@ -3,12 +3,14 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   Utensils, Calendar, Zap, Droplets, Target, Clock, 
-  ChevronRight, Plus, History, AlertCircle, Sparkles, TrendingUp
+  ChevronRight, Plus, History, AlertCircle, Sparkles, TrendingUp,
+  ShoppingCart, Dumbbell, Eye
 } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
+import PlanDetailModal from '../components/PlanDetailModal';
 import { Button } from '../components/ui/button';
 import { Progress } from '../components/ui/progress';
 
@@ -22,6 +24,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [selectedDay, setSelectedDay] = useState(0);
+  const [showPlanModal, setShowPlanModal] = useState(false);
 
   useEffect(() => {
     fetchData();
