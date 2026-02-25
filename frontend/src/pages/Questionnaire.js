@@ -268,6 +268,18 @@ const Questionnaire = () => {
                 data-testid="q-nombre"
               />
             </div>
+            <div>
+              <Label>WhatsApp (para recordatorios)</Label>
+              <Input
+                type="tel"
+                value={formData.telefono_whatsapp}
+                onChange={(e) => updateField('telefono_whatsapp', e.target.value)}
+                placeholder="Ej: 55 1234 5678"
+                className="h-14 rounded-xl"
+                data-testid="q-whatsapp"
+              />
+              <p className="text-xs text-muted-foreground mt-1">Opcional - Te enviaremos recordatorios de comidas</p>
+            </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>Edad</Label>

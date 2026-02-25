@@ -56,6 +56,7 @@ class UserResponse(BaseModel):
 class QuestionnaireData(BaseModel):
     # Etapa 1 - Datos Generales
     nombre: str
+    telefono_whatsapp: Optional[str] = None
     edad: int
     fecha_nacimiento: str
     sexo: str
