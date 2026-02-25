@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import PlanDetailModal from '../components/PlanDetailModal';
+import ReminderNotifications from '../components/ReminderNotifications';
 import { Button } from '../components/ui/button';
 import { Progress } from '../components/ui/progress';
 
