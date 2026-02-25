@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   Utensils, Calendar, Zap, Droplets, Target, Clock, 
-  ChevronRight, Plus, History, AlertCircle, Sparkles
+  ChevronRight, Plus, History, AlertCircle, Sparkles, TrendingUp
 } from 'lucide-react';
 import axios from 'axios';
 import { toast } from 'sonner';
