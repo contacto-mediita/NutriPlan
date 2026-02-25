@@ -1550,7 +1550,7 @@ async def get_admin_user_detail(user_id: str, admin: dict = Depends(get_admin_us
     """Get detailed user info for admin"""
     user = await db.users.find_one(
         {"id": user_id},
-        {"_id": 0, "password_hash": 0}
+        {"_id": 0, "password_hash": 0, "password": 0}
     )
     
     if not user:
