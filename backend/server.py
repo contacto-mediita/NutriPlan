@@ -326,6 +326,100 @@ async def get_progress_stats(current_user: dict = Depends(get_current_user)):
         goal=goal
     )
 
+# ============== HYDRATION TRACKING ==============
+
+class HydrationRecord(BaseModel):
+    glasses: int
+    date: str
+
+class HydrationGoal(BaseModel):
+    daily_glasses: int
+    daily_ml: int
+    weight_kg: float
+    goal: str
+
+@api_router.get("/hydration/goal")
+async def get_hydration_goal(current_user: dict = Depends(get_current_user)):
+    """Calculate daily water goal based on weight and nutritional objective"""
+    questionnaire = await db.questionnaire_responses.find_one(
+        {"user_id": current_user["id"]},
+        {"_id": 0},
+        sort=[("created_at", -1)]
+    )
+    
+    if not questionnaire:
+        # Default goal
+        return HydrationGoal(daily_glasses=8, daily_ml=2000, weight_kg=70, goal="general")
+    
+    q_data = questionnaire.get("data", {})
+    peso = q_data.get("peso", 70)
+    objetivo = q_data.get("objetivo_principal", "").lower()
+    
+    # Base: 30-35ml per kg of body weight
+    base_ml = peso * 33
+    
+    # Adjust based on goal
+    if "bajar" in objetivo:
+        # More water for weight loss (helps metabolism and satiety)
+        base_ml = peso * 40
+    elif "aumentar" in objetivo or "masa" in objetivo:
+        # More water for muscle building (hydration for protein synthesis)
+        base_ml = peso * 38
+    
+    # Convert to glasses (250ml per glass)
+    daily_glasses = round(base_ml / 250)
+    
+    return HydrationGoal(
+        daily_glasses=daily_glasses,
+        daily_ml=round(base_ml),
+        weight_kg=peso,
+        goal=objetivo or "general"
+    )
+
+@api_router.post("/hydration/log")
+async def log_hydration(data: HydrationRecord, current_user: dict = Depends(get_current_user)):
+    """Log water intake for a specific date"""
+    record_date = data.date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    
+    # Upsert - update if exists, insert if not
+    await db.hydration_records.update_one(
+        {"user_id": current_user["id"], "date": record_date},
+        {"$set": {
+            "user_id": current_user["id"],
+            "glasses": data.glasses,
+            "date": record_date,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }},
+        upsert=True
+    )
+    
+    return {"message": "Hydration logged", "glasses": data.glasses, "date": record_date}
+
+@api_router.get("/hydration/today")
+async def get_today_hydration(current_user: dict = Depends(get_current_user)):
+    """Get today's hydration record"""
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    
+    record = await db.hydration_records.find_one(
+        {"user_id": current_user["id"], "date": today},
+        {"_id": 0}
+    )
+    
+    if not record:
+        return {"glasses": 0, "date": today}
+    
+    return {"glasses": record.get("glasses", 0), "date": today}
+
+@api_router.get("/hydration/history")
+async def get_hydration_history(days: int = 7, current_user: dict = Depends(get_current_user)):
+    """Get hydration history for the last N days"""
+    records = await db.hydration_records.find(
+        {"user_id": current_user["id"]},
+        {"_id": 0}
+    ).sort("date", -1).limit(days).to_list(days)
+    
+    return records
+
 # ============== MEAL PLAN GENERATION ==============
 
 @api_router.post("/meal-plans/trial")
