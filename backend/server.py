@@ -215,6 +215,166 @@ async def get_questionnaire(current_user: dict = Depends(get_current_user)):
 
 # ============== MEAL PLAN GENERATION ==============
 
+@api_router.post("/meal-plans/trial")
+async def generate_trial_plan(current_user: dict = Depends(get_current_user)):
+    """Generate a free 1-day trial plan with 4 meals (desayuno, snack, comida, cena)"""
+    
+    # Check if user already used trial
+    existing_trial = await db.meal_plans.find_one(
+        {"user_id": current_user["id"], "plan_type": "trial"},
+        {"_id": 0}
+    )
+    
+    if existing_trial:
+        raise HTTPException(status_code=400, detail="Ya utilizaste tu plan de prueba gratuito")
+    
+    # Get questionnaire data
+    questionnaire = await db.questionnaire_responses.find_one(
+        {"user_id": current_user["id"]},
+        {"_id": 0},
+        sort=[("created_at", -1)]
+    )
+    
+    if not questionnaire:
+        raise HTTPException(status_code=400, detail="Primero debes completar el cuestionario")
+    
+    q_data = questionnaire["data"]
+    
+    # Calculate BMR using Mifflin-St Jeor
+    peso = q_data["peso"]
+    estatura = q_data["estatura"]
+    edad = q_data["edad"]
+    sexo = q_data["sexo"]
+    
+    if sexo.lower() == "masculino":
+        bmr = 10 * peso + 6.25 * estatura - 5 * edad + 5
+    else:
+        bmr = 10 * peso + 6.25 * estatura - 5 * edad - 161
+    
+    # Activity multiplier
+    activity_level = 1.2
+    if q_data.get("trabajo_fisico"):
+        activity_level = 1.55
+    if q_data.get("dias_ejercicio", 0) >= 3:
+        activity_level = max(activity_level, 1.55)
+    if q_data.get("dias_ejercicio", 0) >= 5:
+        activity_level = 1.725
+    
+    tdee = bmr * activity_level
+    
+    # Adjust for goal
+    objetivo = q_data["objetivo_principal"]
+    if "bajar" in objetivo.lower():
+        calories_target = int(tdee * 0.8)
+    elif "aumentar" in objetivo.lower() or "masa" in objetivo.lower():
+        calories_target = int(tdee * 1.15)
+    else:
+        calories_target = int(tdee)
+    
+    # Calculate macros
+    protein_ratio = 0.30 if "masa" in objetivo.lower() else 0.25
+    fat_ratio = 0.25
+    carb_ratio = 1 - protein_ratio - fat_ratio
+    
+    macros = {
+        "proteinas": round((calories_target * protein_ratio) / 4, 1),
+        "carbohidratos": round((calories_target * carb_ratio) / 4, 1),
+        "grasas": round((calories_target * fat_ratio) / 9, 1)
+    }
+    
+    # Generate trial plan with AI
+    from emergentintegrations.llm.chat import LlmChat, UserMessage
+    
+    api_key = os.environ.get('EMERGENT_LLM_KEY')
+    
+    prompt = f"""Genera un plan alimenticio de UN SOLO DÍA (prueba gratuita) en español para una persona con:
+
+DATOS:
+- Nombre: {q_data['nombre']}
+- Objetivo: {objetivo}
+- Peso: {peso} kg, Estatura: {estatura} cm
+- Vegetariano: {'Sí' if q_data.get('vegetariano') else 'No'}
+- Alergias: {', '.join(q_data.get('alergias', [])) or 'Ninguna'}
+
+REQUERIMIENTOS:
+- Calorías objetivo: {calories_target} kcal/día
+- Proteínas: {macros['proteinas']}g
+- Carbohidratos: {macros['carbohidratos']}g
+- Grasas: {macros['grasas']}g
+
+Genera EXACTAMENTE 4 comidas: Desayuno, Snack, Comida, Cena.
+Para cada comida incluye: nombre del platillo, ingredientes principales, calorías aproximadas.
+
+Responde en JSON:
+{{
+  "dia": "Plan de Prueba",
+  "comidas": [
+    {{"tipo": "Desayuno", "nombre": "...", "ingredientes": ["..."], "calorias": 000}},
+    {{"tipo": "Snack", "nombre": "...", "ingredientes": ["..."], "calorias": 000}},
+    {{"tipo": "Comida", "nombre": "...", "ingredientes": ["..."], "calorias": 000}},
+    {{"tipo": "Cena", "nombre": "...", "ingredientes": ["..."], "calorias": 000}}
+  ],
+  "recomendaciones": ["...", "...", "..."]
+}}"""
+    
+    try:
+        chat = LlmChat(
+            api_key=api_key,
+            session_id=f"trial-{current_user['id']}-{uuid.uuid4()}",
+            system_message="Eres un nutriólogo experto. Responde solo en JSON válido."
+        ).with_model("openai", "gpt-5.2")
+        
+        user_message = UserMessage(text=prompt)
+        response = await chat.send_message(user_message)
+        
+        import json
+        clean_response = response.strip()
+        if clean_response.startswith("```"):
+            clean_response = clean_response.split("```")[1]
+            if clean_response.startswith("json"):
+                clean_response = clean_response[4:]
+        clean_response = clean_response.strip()
+        
+        day_data = json.loads(clean_response)
+        plan_data = {"dias": [day_data]}
+        recommendations = day_data.get("recomendaciones", [])
+        
+    except Exception as e:
+        logger.error(f"Error generating trial plan: {e}")
+        # Fallback plan
+        plan_data = {
+            "dias": [{
+                "dia": "Plan de Prueba",
+                "comidas": [
+                    {"tipo": "Desayuno", "nombre": "Avena con frutas y nueces", "ingredientes": ["avena", "plátano", "fresas", "nueces", "miel"], "calorias": int(calories_target * 0.25)},
+                    {"tipo": "Snack", "nombre": "Yogur griego con granola", "ingredientes": ["yogur griego", "granola", "arándanos"], "calorias": int(calories_target * 0.15)},
+                    {"tipo": "Comida", "nombre": "Pollo a la plancha con verduras", "ingredientes": ["pechuga de pollo", "brócoli", "zanahoria", "arroz integral"], "calorias": int(calories_target * 0.35)},
+                    {"tipo": "Cena", "nombre": "Ensalada mediterránea con atún", "ingredientes": ["lechuga", "tomate", "pepino", "atún", "aceite de oliva"], "calorias": int(calories_target * 0.25)}
+                ]
+            }]
+        }
+        recommendations = [
+            "Bebe al menos 2 litros de agua al día",
+            "Come despacio y mastica bien los alimentos",
+            "Este es solo un plan de prueba, suscríbete para obtener tu plan completo"
+        ]
+    
+    # Save trial plan
+    plan_id = str(uuid.uuid4())
+    plan_doc = {
+        "id": plan_id,
+        "user_id": current_user["id"],
+        "plan_type": "trial",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "plan_data": plan_data,
+        "recommendations": recommendations,
+        "calories_target": calories_target,
+        "macros": macros
+    }
+    await db.meal_plans.insert_one(plan_doc)
+    
+    return MealPlanResponse(**plan_doc)
+
 @api_router.post("/meal-plans/generate")
 async def generate_meal_plan(current_user: dict = Depends(get_current_user)):
     # Check subscription
