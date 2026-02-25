@@ -77,10 +77,25 @@ const PlanDetailModal = ({ plan, isOpen, onClose }) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-heading flex items-center gap-3">
-            <Utensils className="w-7 h-7 text-brand-green" />
-            Mi Plan Completo
-          </DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-2xl font-heading flex items-center gap-3">
+              <Utensils className="w-7 h-7 text-brand-green" />
+              Mi Plan Completo
+            </DialogTitle>
+            <Button
+              onClick={handleDownloadPDF}
+              disabled={downloading}
+              className="bg-brand-orange hover:bg-brand-orange/90 rounded-full"
+              data-testid="download-pdf-btn"
+            >
+              {downloading ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Download className="w-4 h-4 mr-2" />
+              )}
+              {downloading ? 'Descargando...' : 'Descargar PDF'}
+            </Button>
+          </div>
         </DialogHeader>
 
         <Tabs defaultValue="menu" className="mt-4">
