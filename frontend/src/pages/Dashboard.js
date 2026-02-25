@@ -427,8 +427,6 @@ const Dashboard = () => {
                       </span>
                     )}
                   </motion.div>
-                    className="absolute inset-y-0 left-0 bg-gradient-to-r from-brand-green to-brand-lime rounded-full"
-                  />
                 </div>
                 <p className="text-xs text-muted-foreground mt-2 text-center">
                   💪 Con tu plan de {questionnaire.data.dias_ejercicio || 0} días de ejercicio por semana
