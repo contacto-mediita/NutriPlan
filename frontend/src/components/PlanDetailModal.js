@@ -3,11 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Utensils, ShoppingCart, Dumbbell, Home, Building2, 
   ChevronDown, ChevronUp, Clock, Repeat, Timer, Download, Loader2,
-  Check, Star, Zap, DollarSign, Target, Flame, Heart
+  Check, Star, Zap, DollarSign, Target, Flame, Heart, Info
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from './ui/button';
 import { Checkbox } from './ui/checkbox';
+import { getExerciseIllustration } from './ExerciseIllustrations';
 import {
   Dialog,
   DialogContent,
