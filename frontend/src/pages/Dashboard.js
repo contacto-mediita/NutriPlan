@@ -118,56 +118,116 @@ const Dashboard = () => {
     return { label: 'Obesidad', color: 'text-red-600', bg: 'bg-red-100' };
   };
 
-  // Calculate estimated time to reach goal
+  // Calculate healthy weight range based on age, sex, and height
+  const calculateHealthyWeightRange = () => {
+    if (!questionnaire?.data) return null;
+    
+    const estatura = questionnaire.data.estatura / 100;
+    const edad = questionnaire.data.edad;
+    const sexo = questionnaire.data.sexo?.toLowerCase();
+    
+    if (!estatura) return null;
+    
+    // Base BMI range: 18.5 - 24.9
+    // Adjust slightly for age (older adults can have slightly higher healthy BMI)
+    let minBMI = 18.5;
+    let maxBMI = 24.9;
+    
+    if (edad > 65) {
+      minBMI = 20;
+      maxBMI = 27;
+    } else if (edad > 50) {
+      minBMI = 19;
+      maxBMI = 26;
+    }
+    
+    const minWeight = (minBMI * estatura * estatura).toFixed(1);
+    const maxWeight = (maxBMI * estatura * estatura).toFixed(1);
+    
+    return { min: minWeight, max: maxWeight };
+  };
+
+  // Calculate estimated time to reach goal using real current weight
   const calculateEstimatedTime = () => {
     if (!questionnaire?.data) return null;
     
-    const peso = questionnaire.data.peso;
+    const pesoInicial = questionnaire.data.peso;
+    const pesoActual = currentWeight || pesoInicial; // Use current weight if available
     const estatura = questionnaire.data.estatura / 100;
     const objetivo = questionnaire.data.objetivo_principal?.toLowerCase() || '';
     const diasEjercicio = questionnaire.data.dias_ejercicio || 0;
     
-    if (!peso || !estatura) return null;
+    if (!pesoInicial || !estatura) return null;
+    
+    // Calculate healthy weight range
+    const healthyRange = calculateHealthyWeightRange();
     
     // Calculate ideal weight based on BMI 22 (middle of healthy range)
     const pesoIdeal = 22 * (estatura * estatura);
-    const diferencia = Math.abs(peso - pesoIdeal);
     
     // Estimate weekly change based on objective and exercise
     let weeklyChange = 0;
     
     if (objetivo.includes('bajar')) {
       // Weight loss: 0.5-1kg per week depending on exercise
-      weeklyChange = 0.5 + (diasEjercicio * 0.1); // Max ~1kg/week with 5 days exercise
+      weeklyChange = 0.5 + (diasEjercicio * 0.1);
+      const diferencia = Math.max(0, pesoActual - pesoIdeal);
       const weeksNeeded = diferencia / weeklyChange;
+      
+      // Calculate progress percentage
+      const totalToLose = pesoInicial - pesoIdeal;
+      const alreadyLost = pesoInicial - pesoActual;
+      const progressPercent = totalToLose > 0 ? Math.min(100, Math.max(0, (alreadyLost / totalToLose) * 100)) : 0;
+      
       return {
         weeks: Math.ceil(weeksNeeded),
         targetWeight: pesoIdeal.toFixed(1),
         weeklyChange: weeklyChange.toFixed(2),
-        direction: 'bajar'
+        direction: 'bajar',
+        currentWeight: pesoActual,
+        initialWeight: pesoInicial,
+        progressPercent: progressPercent.toFixed(0),
+        healthyRange
       };
     } else if (objetivo.includes('aumentar') || objetivo.includes('masa')) {
       // Muscle gain: 0.25-0.5kg per week
-      weeklyChange = 0.25 + (diasEjercicio * 0.05); // Max ~0.5kg/week
-      const targetWeight = peso + (peso * 0.1); // Target 10% more
-      const weeksNeeded = (targetWeight - peso) / weeklyChange;
+      weeklyChange = 0.25 + (diasEjercicio * 0.05);
+      const targetWeight = pesoInicial + (pesoInicial * 0.1);
+      const diferencia = Math.max(0, targetWeight - pesoActual);
+      const weeksNeeded = diferencia / weeklyChange;
+      
+      // Calculate progress percentage
+      const totalToGain = targetWeight - pesoInicial;
+      const alreadyGained = pesoActual - pesoInicial;
+      const progressPercent = totalToGain > 0 ? Math.min(100, Math.max(0, (alreadyGained / totalToGain) * 100)) : 0;
+      
       return {
         weeks: Math.ceil(weeksNeeded),
         targetWeight: targetWeight.toFixed(1),
         weeklyChange: weeklyChange.toFixed(2),
-        direction: 'aumentar'
+        direction: 'aumentar',
+        currentWeight: pesoActual,
+        initialWeight: pesoInicial,
+        progressPercent: progressPercent.toFixed(0),
+        healthyRange
       };
     } else if (objetivo.includes('mantener')) {
       return {
         weeks: 0,
-        targetWeight: peso.toFixed(1),
+        targetWeight: pesoInicial.toFixed(1),
         weeklyChange: '0',
-        direction: 'mantener'
+        direction: 'mantener',
+        currentWeight: pesoActual,
+        initialWeight: pesoInicial,
+        progressPercent: 100,
+        healthyRange
       };
     }
     
     return null;
   };
+
+  const healthyWeightRange = calculateHealthyWeightRange();
 
   const bmi = calculateBMI();
   const bmiCategory = getBMICategory(bmi);
