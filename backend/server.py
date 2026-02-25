@@ -62,6 +62,7 @@ class QuestionnaireData(BaseModel):
     sexo: str
     estatura: float
     peso: float
+    foto_usuario: Optional[str] = None  # Base64 or URL of user photo
     # Etapa 2 - Objetivos
     objetivo_principal: str
     objetivos_secundarios: List[str] = []
@@ -75,6 +76,8 @@ class QuestionnaireData(BaseModel):
     # Etapa 4 - Salud
     padecimientos: List[str] = []
     medicamentos_controlados: bool = False
+    lesiones_restricciones: List[str] = []  # Injuries or exercise restrictions
+    descripcion_lesion: str = ""  # Description of injury if any
     # Etapa 5 - Síntomas
     sintomas: List[str] = []
     # Etapa 6 - Hábitos
