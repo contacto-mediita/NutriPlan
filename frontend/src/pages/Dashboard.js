@@ -297,14 +297,24 @@ const Dashboard = () => {
                             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                               {meal.tipo}
                             </span>
-                            <span className="text-sm font-medium text-brand-orange">
-                              {meal.calorias} kcal
-                            </span>
+                            {meal.calorias && (
+                              <span className="text-sm font-medium text-brand-orange">
+                                {meal.calorias} kcal
+                              </span>
+                            )}
                           </div>
                           <h4 className="font-semibold text-foreground mb-1">{meal.nombre}</h4>
                           <p className="text-sm text-muted-foreground truncate">
-                            {meal.ingredientes?.join(', ')}
+                            {Array.isArray(meal.ingredientes) 
+                              ? meal.ingredientes.map(ing => 
+                                  typeof ing === 'object' ? ing.item : ing
+                                ).join(', ')
+                              : ''
+                            }
                           </p>
+                          {meal.tip && (
+                            <p className="text-xs text-brand-green mt-1 italic">💡 {meal.tip}</p>
+                          )}
                         </div>
                       </motion.div>
                     ))}
