@@ -448,6 +448,13 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Plan Detail Modal */}
+      <PlanDetailModal 
+        plan={currentPlan}
+        isOpen={showPlanModal}
+        onClose={() => setShowPlanModal(false)}
+      />
     </div>
   );
 };
