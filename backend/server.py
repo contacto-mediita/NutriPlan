@@ -1432,6 +1432,222 @@ async def stripe_webhook(request: Request):
         logger.error(f"Webhook error: {e}")
         return {"received": True}
 
+# ============== ADMIN PANEL ==============
+
+# Admin credentials (in production, these should be in environment variables)
+ADMIN_EMAILS = os.environ.get('ADMIN_EMAILS', 'admin@nutriplan.com').split(',')
+
+async def get_admin_user(current_user: dict = Depends(get_current_user)):
+    """Verify user is an admin"""
+    if current_user["email"] not in ADMIN_EMAILS:
+        raise HTTPException(status_code=403, detail="No tienes permisos de administrador")
+    return current_user
+
+class AdminStats(BaseModel):
+    total_users: int
+    active_subscriptions: int
+    total_plans_generated: int
+    total_revenue: float
+    users_by_subscription: Dict[str, int]
+    plans_by_type: Dict[str, int]
+    recent_signups: int
+    questionnaire_completion_rate: float
+
+@api_router.get("/admin/stats")
+async def get_admin_stats(admin: dict = Depends(get_admin_user)):
+    """Get dashboard statistics for admin"""
+    
+    # Total users
+    total_users = await db.users.count_documents({})
+    
+    # Active subscriptions
+    now = datetime.now(timezone.utc).isoformat()
+    active_subs = await db.users.count_documents({
+        "subscription_expires": {"$gt": now}
+    })
+    
+    # Total plans generated
+    total_plans = await db.meal_plans.count_documents({})
+    
+    # Calculate revenue from completed payments
+    pipeline = [
+        {"$match": {"payment_status": "paid"}},
+        {"$group": {"_id": None, "total": {"$sum": "$amount"}}}
+    ]
+    revenue_result = await db.payment_transactions.aggregate(pipeline).to_list(1)
+    total_revenue = revenue_result[0]["total"] if revenue_result else 0
+    
+    # Users by subscription type
+    users_by_sub = {}
+    for sub_type in ["trial", "3days", "weekly", "biweekly", "monthly"]:
+        count = await db.users.count_documents({"subscription_type": sub_type})
+        if count > 0:
+            users_by_sub[sub_type] = count
+    
+    # Plans by type
+    plans_by_type = {}
+    for plan_type in ["trial", "3days", "weekly", "biweekly", "monthly"]:
+        count = await db.meal_plans.count_documents({"plan_type": plan_type})
+        if count > 0:
+            plans_by_type[plan_type] = count
+    
+    # Recent signups (last 7 days)
+    seven_days_ago = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+    recent_signups = await db.users.count_documents({
+        "created_at": {"$gt": seven_days_ago}
+    })
+    
+    # Questionnaire completion rate
+    users_with_questionnaire = await db.questionnaire_responses.distinct("user_id")
+    completion_rate = (len(users_with_questionnaire) / total_users * 100) if total_users > 0 else 0
+    
+    return AdminStats(
+        total_users=total_users,
+        active_subscriptions=active_subs,
+        total_plans_generated=total_plans,
+        total_revenue=total_revenue,
+        users_by_subscription=users_by_sub,
+        plans_by_type=plans_by_type,
+        recent_signups=recent_signups,
+        questionnaire_completion_rate=round(completion_rate, 1)
+    )
+
+@api_router.get("/admin/users")
+async def get_admin_users(
+    skip: int = 0,
+    limit: int = 20,
+    search: str = "",
+    admin: dict = Depends(get_admin_user)
+):
+    """Get list of users for admin"""
+    query = {}
+    if search:
+        query["$or"] = [
+            {"name": {"$regex": search, "$options": "i"}},
+            {"email": {"$regex": search, "$options": "i"}}
+        ]
+    
+    users = await db.users.find(
+        query,
+        {"_id": 0, "password_hash": 0}
+    ).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    
+    total = await db.users.count_documents(query)
+    
+    # Add questionnaire and plan info
+    for user in users:
+        user["has_questionnaire"] = await db.questionnaire_responses.count_documents(
+            {"user_id": user["id"]}
+        ) > 0
+        user["plans_count"] = await db.meal_plans.count_documents(
+            {"user_id": user["id"]}
+        )
+    
+    return {"users": users, "total": total, "skip": skip, "limit": limit}
+
+@api_router.get("/admin/users/{user_id}")
+async def get_admin_user_detail(user_id: str, admin: dict = Depends(get_admin_user)):
+    """Get detailed user info for admin"""
+    user = await db.users.find_one(
+        {"id": user_id},
+        {"_id": 0, "password_hash": 0}
+    )
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    
+    # Get questionnaire
+    questionnaire = await db.questionnaire_responses.find_one(
+        {"user_id": user_id},
+        {"_id": 0}
+    )
+    
+    # Get plans
+    plans = await db.meal_plans.find(
+        {"user_id": user_id},
+        {"_id": 0, "plan_data": 0}
+    ).sort("created_at", -1).to_list(10)
+    
+    # Get payments
+    payments = await db.payment_transactions.find(
+        {"user_id": user_id},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(10)
+    
+    # Get progress records
+    progress = await db.weight_records.find(
+        {"user_id": user_id},
+        {"_id": 0}
+    ).sort("date", -1).to_list(30)
+    
+    return {
+        "user": user,
+        "questionnaire": questionnaire,
+        "plans": plans,
+        "payments": payments,
+        "progress": progress
+    }
+
+@api_router.put("/admin/users/{user_id}/subscription")
+async def update_user_subscription(
+    user_id: str,
+    subscription_type: str,
+    days: int,
+    admin: dict = Depends(get_admin_user)
+):
+    """Manually update user subscription (admin)"""
+    expires = datetime.now(timezone.utc) + timedelta(days=days)
+    
+    result = await db.users.update_one(
+        {"id": user_id},
+        {"$set": {
+            "subscription_type": subscription_type,
+            "subscription_expires": expires.isoformat(),
+            "updated_by_admin": admin["email"],
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    
+    return {"message": "Suscripción actualizada", "expires": expires.isoformat()}
+
+@api_router.get("/admin/payments")
+async def get_admin_payments(
+    skip: int = 0,
+    limit: int = 20,
+    status: str = "",
+    admin: dict = Depends(get_admin_user)
+):
+    """Get list of payments for admin"""
+    query = {}
+    if status:
+        query["payment_status"] = status
+    
+    payments = await db.payment_transactions.find(
+        query,
+        {"_id": 0}
+    ).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    
+    # Add user info
+    for payment in payments:
+        user = await db.users.find_one(
+            {"id": payment.get("user_id")},
+            {"_id": 0, "name": 1, "email": 1}
+        )
+        payment["user"] = user
+    
+    total = await db.payment_transactions.count_documents(query)
+    
+    return {"payments": payments, "total": total}
+
+@api_router.get("/admin/check")
+async def check_admin_status(current_user: dict = Depends(get_current_user)):
+    """Check if current user is admin"""
+    is_admin = current_user["email"] in ADMIN_EMAILS
+    return {"is_admin": is_admin, "email": current_user["email"]}
+
 # ============== ROOT ==============
 
 @api_router.get("/")
