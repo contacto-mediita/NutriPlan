@@ -436,8 +436,17 @@ async def get_meal_plan(plan_id: str, current_user: dict = Depends(get_current_u
 # ============== STRIPE PAYMENTS ==============
 
 PLAN_PRICES = {
-    "weekly": 199.00,
-    "monthly": 499.00
+    "3days": 49.00,
+    "weekly": 119.00,
+    "biweekly": 199.00,
+    "monthly": 349.00
+}
+
+PLAN_DURATIONS = {
+    "3days": 3,
+    "weekly": 7,
+    "biweekly": 15,
+    "monthly": 30
 }
 
 @api_router.post("/payments/checkout")
