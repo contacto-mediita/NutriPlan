@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ArrowRight, User, Target, Activity, Heart, AlertCircle, Wine, Utensils, MapPin, Check, ShieldCheck, FileText } from 'lucide-react';
 import { toast } from 'sonner';
