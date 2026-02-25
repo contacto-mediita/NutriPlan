@@ -251,6 +251,109 @@ const Dashboard = () => {
           </motion.div>
         )}
 
+        {/* Goal & BMI Section */}
+        {questionnaire?.data && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-gradient-to-r from-brand-green/10 via-brand-lime/10 to-brand-orange/10 rounded-3xl p-6 mb-8 border border-brand-green/20"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Objetivo */}
+              <div className="flex items-start gap-4">
+                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-sm">
+                  <Flag className="w-7 h-7 text-brand-green" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground font-medium">Mi Objetivo</p>
+                  <p className="text-xl font-bold text-foreground capitalize">
+                    {questionnaire.data.objetivo_principal || 'No definido'}
+                  </p>
+                  {questionnaire.data.objetivos_secundarios?.length > 0 && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      + {questionnaire.data.objetivos_secundarios.slice(0, 2).join(', ')}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* IMC */}
+              <div className="flex items-start gap-4">
+                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-sm">
+                  <Scale className="w-7 h-7 text-brand-orange" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground font-medium">Índice de Masa Corporal</p>
+                  <div className="flex items-baseline gap-2">
+                    <p className="text-xl font-bold text-foreground">{bmi || '--'}</p>
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${bmiCategory.bg} ${bmiCategory.color}`}>
+                      {bmiCategory.label}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {questionnaire.data.peso}kg / {questionnaire.data.estatura}cm
+                  </p>
+                </div>
+              </div>
+
+              {/* Tiempo Estimado */}
+              <div className="flex items-start gap-4">
+                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-sm">
+                  <Timer className="w-7 h-7 text-purple-500" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground font-medium">Tiempo Estimado</p>
+                  {estimatedTime ? (
+                    <>
+                      {estimatedTime.direction === 'mantener' ? (
+                        <p className="text-xl font-bold text-foreground">Mantenimiento</p>
+                      ) : (
+                        <>
+                          <p className="text-xl font-bold text-foreground">
+                            {estimatedTime.weeks} semanas
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Meta: {estimatedTime.targetWeight}kg ({estimatedTime.weeklyChange}kg/semana)
+                          </p>
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <p className="text-xl font-bold text-foreground">--</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Progress to Goal */}
+            {estimatedTime && estimatedTime.direction !== 'mantener' && (
+              <div className="mt-6 pt-6 border-t border-brand-green/10">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-foreground">Progreso hacia tu objetivo</span>
+                  <span className="text-sm text-muted-foreground">
+                    {questionnaire.data.peso}kg → {estimatedTime.targetWeight}kg
+                  </span>
+                </div>
+                <div className="relative h-3 bg-white rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ 
+                      width: estimatedTime.direction === 'bajar' 
+                        ? `${Math.min(100, Math.max(0, ((questionnaire.data.peso - parseFloat(estimatedTime.targetWeight)) / (questionnaire.data.peso - parseFloat(estimatedTime.targetWeight))) * 100))}%`
+                        : '5%' // Starting point for gaining
+                    }}
+                    transition={{ duration: 1, ease: "easeOut" }}
+                    className="absolute inset-y-0 left-0 bg-gradient-to-r from-brand-green to-brand-lime rounded-full"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground mt-2 text-center">
+                  💪 Con tu plan de {questionnaire.data.dias_ejercicio || 0} días de ejercicio por semana
+                </p>
+              </div>
+            )}
+          </motion.div>
+        )}
+
         {/* Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <motion.div
