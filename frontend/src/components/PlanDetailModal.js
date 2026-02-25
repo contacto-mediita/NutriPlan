@@ -28,6 +28,36 @@ const PlanDetailModal = ({ plan, isOpen, onClose }) => {
 
   if (!plan) return null;
 
+  const handleDownloadPDF = async () => {
+    setDownloading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API}/meal-plans/${plan.id}/pdf`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) throw new Error('Error al descargar');
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `plan-alimenticio-${plan.id.slice(0, 8)}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast.success('¡PDF descargado correctamente!');
+    } catch (error) {
+      console.error(error);
+      toast.error('Error al descargar el PDF');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   const days = plan.plan_data?.dias || [];
   const listaSuper = plan.plan_data?.lista_super || {};
   const guiaEjercicios = plan.plan_data?.guia_ejercicios || {};
