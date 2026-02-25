@@ -24,35 +24,6 @@ import {
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-// Exercise icons mapping
-const EXERCISE_ICONS = {
-  "Lagartijas": "💪",
-  "Sentadillas": "🦵",
-  "Plancha": "🧘",
-  "Burpees": "🔥",
-  "Zancadas": "🏃",
-  "Fondos": "💪",
-  "Press": "🏋️",
-  "Curl": "💪",
-  "Remo": "🚣",
-  "Jalón": "🎯",
-  "Mountain": "⛰️",
-  "Jumping": "⭐",
-  "Elevación": "⬆️",
-  "Puente": "🌉",
-  "Bicicleta": "🚴",
-  "Superman": "🦸"
-};
-
-const getExerciseIcon = (name) => {
-  for (const [key, icon] of Object.entries(EXERCISE_ICONS)) {
-    if (name.toLowerCase().includes(key.toLowerCase())) {
-      return icon;
-    }
-  }
-  return "🏃";
-};
-
 const PlanDetailModal = ({ plan, isOpen, onClose }) => {
   const [selectedDay, setSelectedDay] = useState(0);
   const [expandedMeal, setExpandedMeal] = useState(null);
