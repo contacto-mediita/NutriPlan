@@ -470,6 +470,39 @@ const Questionnaire = () => {
                 Si presentas alguna condición o tomas medicamentos, recuerda que esta información debe ser evaluada por tu médico. Nuestro programa es solo una guía.
               </div>
             ) : null}
+            
+            {/* Lesiones y Restricciones para Ejercicio */}
+            <div className="pt-4 border-t border-gray-100">
+              <Label className="mb-3 block">¿Tienes alguna lesión o restricción para hacer ejercicio?</Label>
+              <div className="grid grid-cols-2 gap-2">
+                {['Ninguna', 'Lesión de rodilla', 'Lesión de espalda', 'Lesión de hombro', 'Lesión de tobillo', 'Hernia', 'Problema de cadera', 'Tendinitis', 'Otra'].map((lesion) => (
+                  <label 
+                    key={lesion}
+                    className={`flex items-center p-3 rounded-xl border-2 cursor-pointer transition-all text-sm ${formData.lesiones_restricciones.includes(lesion) ? 'border-orange-400 bg-orange-50' : 'border-gray-200 hover:border-gray-300'}`}
+                  >
+                    <Checkbox
+                      checked={formData.lesiones_restricciones.includes(lesion)}
+                      onCheckedChange={() => toggleArrayItem('lesiones_restricciones', lesion)}
+                      className="mr-2"
+                      data-testid={`lesion-${lesion.toLowerCase().replace(/\s/g, '-')}`}
+                    />
+                    <span>{lesion}</span>
+                  </label>
+                ))}
+              </div>
+              {formData.lesiones_restricciones.some(l => l !== 'Ninguna') && (
+                <div className="mt-3">
+                  <Label>Describe tu lesión o restricción</Label>
+                  <Input
+                    value={formData.descripcion_lesion}
+                    onChange={(e) => updateField('descripcion_lesion', e.target.value)}
+                    placeholder="Ej: No puedo hacer sentadillas profundas por mi rodilla..."
+                    className="h-14 rounded-xl mt-2"
+                    data-testid="q-descripcion-lesion"
+                  />
+                </div>
+              )}
+            </div>
           </div>
         )}
 
