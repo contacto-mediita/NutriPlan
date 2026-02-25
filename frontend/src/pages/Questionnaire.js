@@ -56,6 +56,7 @@ const Questionnaire = () => {
   const [formData, setFormData] = useState({
     // Etapa 1
     nombre: user?.name || '',
+    telefono_whatsapp: '',
     edad: '',
     fecha_nacimiento: '',
     sexo: '',
@@ -90,7 +91,11 @@ const Questionnaire = () => {
     platillo_favorito: '',
     // Etapa 8
     frecuencia_restaurantes: '',
-    ticket_promedio: ''
+    ticket_promedio: '',
+    // Recordatorios
+    recordatorios_activos: true,
+    horario_despertar: '07:00',
+    horario_dormir: '22:00'
   });
 
   const progress = ((currentStep + 1) / ETAPAS.length) * 100;
